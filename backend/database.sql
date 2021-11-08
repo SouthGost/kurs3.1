@@ -1,3 +1,4 @@
+-- exampels
 create TABLE film(
     id SERIAL PRIMARY KEY,
     name VARCHAR(255)
