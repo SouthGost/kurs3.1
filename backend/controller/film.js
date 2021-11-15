@@ -15,7 +15,7 @@ class FilmController{
         res.json(films.rows);
     };
 
-    async getOnFilm(req, res){
+    async getOneFilm(req, res){
         const id = req.params.id;
         const film = await db.query(
             'SELECT * FROM test where id = $1',

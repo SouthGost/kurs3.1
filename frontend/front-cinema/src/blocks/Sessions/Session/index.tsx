@@ -1,12 +1,12 @@
 import './style.css';
 import Film from '../../../classes/Film';
 
-interface IFilm_ {
+interface ISession {
     film: Film,
-    setChoosedSession: React.Dispatch<React.SetStateAction<Film|undefined>>
+    setChoosedSession: React.Dispatch<React.SetStateAction<Film|false>>
 };
 
-export default function Session(props:IFilm_) {
+export default function Session(props:ISession) {
 
     return (
         <div className="session">
