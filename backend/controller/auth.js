@@ -1,6 +1,6 @@
 const db = require('../db');
 
-async function getEmployee(login){
+async function getEmployee(login) {
     const employee = await db.query(
         'SELECT * FROM employee where login = $1',
         [login]
@@ -8,7 +8,15 @@ async function getEmployee(login){
     return employee.rows[0];
 }
 
-class EmployeeController{
+async function getUser(login) {
+    const user = await db.query(
+        'SELECT * FROM public.user where login = $1',
+        [login]
+    );
+    return user.rows[0];
+}
+
+class AuthController {
     // checkEmployee(login){
     //     const employee;
     //     async () => {
@@ -25,42 +33,51 @@ class EmployeeController{
     //     return employee.rows[0];
     // }
 
-    async regEmployee(req, res){
-        try{
-            const {login, password, fio, position} = req.body;
+    async regEmployee(req, res) {
+        try {
+            const { login, password, fio, position } = req.body;
             const employee = await getEmployee(login);
-            if(employee !== undefined){
+            if (employee !== undefined) {
                 const message = "Такой работник существует";
                 console.log(message);
-                return res.send(400).json({message});
+                return res.send(400).json({ message });
             }
             const newEmployee = await db.query(
                 'INSERT INTO employee (login, password, fio, position) values ($1, $2, $3, $4) RETURNING *',
                 [login, password, fio, position]
             );
             res.json(newEmployee.rows[0]);
-        } catch(e){
-            return res.send(400).json({message: e});
+        } catch (e) {
+            return res.send(400).json({ message: e });
         }
     };
 
-    async getEmployees(req, res){
+    async getEmployees(req, res) {
         const employees = await db.query('SELECT * FROM employee');
         res.json(employees.rows);
     };
 
-    async logEmployee(req, res){
-        const {login, password} = req.body;
+    async login(req, res) {
+        const { login, password } = req.body;
         const employee = await getEmployee(login);
-        if(employee === undefined){
-            console.log('Пусто');
-            return res.sendStatus(400);
-        } 
-        console.log('Есть');
-        if(employee.password !== password){
-            return res.sendStatus(400);
+        if (employee == undefined) {
+            const user = await getUser(login);
+            if (user === undefined) {
+                console.log('Пусто');
+                return res.sendStatus(400);
+            }
+            console.log('Есть');
+            if (user.password !== password) {
+                return res.sendStatus(400);
+            }
+            return res.json(user);
+        }else{
+            console.log('Есть');
+            if (employee.password !== password) {
+                return res.sendStatus(400);
+            }
+            res.json(employee);
         }
-        res.json(employee);
     };
 
     // async updateEmployee(req, res){
@@ -95,4 +112,4 @@ class EmployeeController{
 
 };
 
-module.exports = new EmployeeController();
+module.exports = new AuthController();

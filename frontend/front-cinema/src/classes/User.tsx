@@ -3,8 +3,8 @@ import {immerable} from "immer"
 
 export default class User{
     [immerable] = true;
-    private login: string;
-    private password: string;
+    protected login: string;
+    protected password: string;
 
     public constructor(
         login: string,
@@ -12,6 +12,10 @@ export default class User{
     ){
         this.login = login;
         this.password = password;
+    }
+
+    getPosition() {
+        return "User";
     }
 
     getLogin(): string {

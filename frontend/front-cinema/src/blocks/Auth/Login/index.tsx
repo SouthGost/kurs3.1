@@ -32,21 +32,21 @@ export default function Login() {
         };
 
         try {
-            const response = await fetch(`http://localhost:8000/api/auth/employee/login`, params);
+            const response = await fetch(`http://localhost:8000/api/auth/login`, params);
             if (response.ok) {
                 const data = await response.json();
                 if (data.position !== undefined) {
-                    // dispatch(setUser(new Employee(
-                    //     data.login,
-                    //     data.password,
-                    //     data.fio,
-                    //     data.position
-                    // )));
+                    dispatch(setUser(new Employee(
+                        data.login,
+                        data.password,
+                        data.fio,
+                        data.position
+                    )));
                 } else {
-                    // dispatch(setUser(new User(
-                    //     data.login,
-                    //     data.password
-                    // )));
+                    dispatch(setUser(new User(
+                        data.login,
+                        data.password
+                    )));
                 }
                 
                 console.log(data);

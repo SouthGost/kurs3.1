@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const server = require('http').Server(app);
 const filmRouter = require('./routes/film');
-const employeeRouter = require('./routes/employee');
+const authRouter = require('./routes/auth');
 const cors = require('cors');
 const corsOpts = {
     origin: '*',
@@ -20,7 +20,7 @@ const corsOpts = {
 app.use(cors(corsOpts));
 app.use(express.json());
 //app.use('/api/film', filmRouter);
-app.use('/api/auth/employee', employeeRouter);
+app.use('/api/auth', authRouter);
 
 // app.get('/', (req,res) => {
 //     res.status(200).send("d");
