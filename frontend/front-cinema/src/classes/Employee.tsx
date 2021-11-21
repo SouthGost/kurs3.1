@@ -1,5 +1,7 @@
 import User from "./User";
 import { Link } from "react-router-dom";
+import { Form, Input, Button, Card, notification, Typography } from 'antd';
+const { Text } = Typography;
 
 export default class Employee extends User {
     private fio: string;
@@ -24,16 +26,14 @@ export default class Employee extends User {
         return this.position;
     }
 
-    getContent(): JSX.Element {
-        return (
-            <>
-                <Link to="/admin">
+    getNavigation(): JSX.Element {
+        const elements = (
+            <Link to="/admin">
+                <Button>
                     Админская
-                </Link>
-                <div>
-                    {this.login}
-                </div>
-            </>
+                </Button>
+            </Link>
         );
+        return this.getDefaultNavigation(elements);
     }
 }

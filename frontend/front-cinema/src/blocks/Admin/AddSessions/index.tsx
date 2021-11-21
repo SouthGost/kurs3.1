@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Input, Button, notification, Modal, Typography, Space } from "antd";
-const { Text, Title } = Typography;
+import { Input, Button, notification, Modal } from "antd";
 
-export default function AddFilm() {
+export default function AddSessions() {
     const [nameFilm, setNameFilm] = useState("");
     const [imgUrlFilm, setImgUrlFilm] = useState("");
     const [ageLimitFilm, setAgeLimitFilm] = useState("");
@@ -56,44 +55,44 @@ export default function AddFilm() {
     }
 
     return (
-        <Space direction="vertical">
-            <Title>Добавить фильм</Title>
-            <Space direction="horizontal">
-                <Text>Имя фильма:</Text>
+        <div>
+            <p>добавить сеанс</p>
+            <div style={{ "display": "flex" }}>
+                <p>Имя_фильма:</p>
                 <Input
                     type="text"
                     onChange={(event) => {
                         setNameFilm(event.target.value);
                     }}
                 ></Input>
-            </Space>
-            <Space direction="horizontal">
-                <Text>Картинка:</Text>
+            </div>
+            <div style={{ "display": "flex" }}>
+                <p>Картинка:</p>
                 <Input
                     type="text"
                     onChange={(event) => {
                         setImgUrlFilm(event.target.value);
                     }}
                 ></Input>
-            </Space>
-            <Space direction="horizontal">
-                <Text>Возрастное ограничение:</Text>
+            </div>
+            <div style={{ "display": "flex" }}>
+                <p>Возрастное_ограничение:</p>
                 <Input
                     type="text"
                     onChange={(event) => {
                         setAgeLimitFilm(event.target.value);
                     }}
                 ></Input>
-            </Space>
-            <Space direction="horizontal">
-                <Text>Описание:</Text>
+            </div>
+            <div style={{ "display": "flex" }}>
+                <p>Описание:</p>
                 <Input
                     type="text"
                     onChange={(event) => {
                         setDescriptionFilm(event.target.value);
                     }}
                 ></Input>
-            </Space>
+            </div>
             <Button
                 type="primary"
                 htmlType="submit"
@@ -101,6 +100,6 @@ export default function AddFilm() {
                     addFilm();
                 }}
             >добавить</Button>
-        </Space>
+        </div>
     );
 }

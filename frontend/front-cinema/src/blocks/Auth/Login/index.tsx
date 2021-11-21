@@ -11,10 +11,10 @@ export default function Login() {
     const dispatch = useAppDispatch();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
-    const token = Cookies.get("token");
+    const [token, setToken] = useState(Cookies.get("token"));
 
     useEffect(() => {
-        async function refresh(){
+        async function refresh() {
             const params = {
                 method: "POST",
                 headers: {
@@ -23,9 +23,9 @@ export default function Login() {
                 body: JSON.stringify({
                     token,
                 }),
-                
+
             };
-    
+
             try {
                 const response = await fetch(`http://localhost:8000/api/auth/refresh`, params);
                 if (response.ok) {
@@ -47,8 +47,11 @@ export default function Login() {
                             password_,
                         )));
                     }
-                    
+
                     console.log(data);
+                } else {
+                    Cookies.remove("token");
+                    setToken(undefined)
                 }
             } catch (err) {
                 Modal.error({
@@ -58,7 +61,7 @@ export default function Login() {
             }
         }
 
-        if(token!== undefined){
+        if (token !== undefined) {
             refresh();
         }
     }, []);
@@ -104,9 +107,9 @@ export default function Login() {
                         password_,
                     )));
                 }
-                Cookies.set("token", data.token, {expires: 7});
+                Cookies.set("token", data.token, { expires: 7 });
                 // Cookies.set("userPassword", data.password, {expexpires: 7});
-                
+
                 console.log(data);
             } else {
                 notification.warning({
@@ -123,39 +126,44 @@ export default function Login() {
     }
 
     return (
-        <Card style={{
-            display: "grid",
-            placeItems: "center",
-        }}>
-            <Form layout="vertical">
-                <Title>Вход</Title>
-                <Form.Item label="Имя пользователя">
-                    <Input
-                        type="text"
-                        onChange={(event) => {
-                            setLogin(event.target.value);
-                        }}
-                    />
-                </Form.Item>
-                <Form.Item label="Пароль">
-                    <Input
-                        type="password"
-                        onChange={(event) => {
-                            setPassword(event.target.value);
-                        }}
-                    />
-                </Form.Item>
-                <Form.Item>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        onClick={() => {
-                            authentication();
-                        }}
-                    >Войти</Button>
-                </Form.Item>
-            </Form>
-        </Card>
-
+        <>
+            {token === undefined ?
+                <Card style={{
+                    display: "grid",
+                    placeItems: "center",
+                }}>
+                    <Form layout="vertical">
+                        <Title>Вход</Title>
+                        <Form.Item label="Имя пользователя">
+                            <Input
+                                type="text"
+                                onChange={(event) => {
+                                    setLogin(event.target.value);
+                                }}
+                            />
+                        </Form.Item>
+                        <Form.Item label="Пароль">
+                            <Input
+                                type="password"
+                                onChange={(event) => {
+                                    setPassword(event.target.value);
+                                }}
+                            />
+                        </Form.Item>
+                        <Form.Item>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                onClick={() => {
+                                    authentication();
+                                }}
+                            >Войти</Button>
+                        </Form.Item>
+                    </Form>
+                </Card>
+                :
+                <></>
+            }
+        </>
     )
 }

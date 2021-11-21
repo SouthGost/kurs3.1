@@ -92,8 +92,13 @@ class AuthController {
         if(token === undefined){
             return res.sendStatus(400);
         }
-        const user = jwt.verify(token, 'key');
-        res.json({user});
+        try{
+            const user = jwt.verify(token, 'key');
+            return res.json({user});
+        }catch(e){
+            console.log(e.message);
+            return res.sendStatus(400);
+        }
     }
 
     // async updateEmployee(req, res){

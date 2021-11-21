@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAppSelector } from '../../reducers/store';
-import { Routes, Route, Link } from 'react-router-dom';
-import AddFilm from './AddFilm'
+import { Routes, Route, Link, Outlet  } from 'react-router-dom';
+import AddFilm from './AddFilm';
 
 
 export default function Admin() {
@@ -15,13 +15,10 @@ export default function Admin() {
 
     return (
         <div>
-            <Link to="addFilm">
+            <Link to="addfilm">
                 add
             </Link>
-            {/* <Routes>
-                <Route path="addfilm" element={<AddFilm />} />
-            </Routes> */}
-            <AddFilm />
+            <Outlet/>
         </div>
     );
 }
