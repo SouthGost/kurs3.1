@@ -1,4 +1,5 @@
 const db = require('../db');
+const jwt = require('jsonwebtoken');
 
 async function getEmployee(login) {
     const employee = await db.query(
@@ -70,15 +71,30 @@ class AuthController {
             if (user.password !== password) {
                 return res.sendStatus(400);
             }
-            return res.json(user);
-        }else{
+            return res.json({
+                user: user,
+                token: jwt.sign(user, "key")
+            });
+        } else {
             console.log('Есть');
             if (employee.password !== password) {
                 return res.sendStatus(400);
             }
-            res.json(employee);
+            res.json({
+                user: employee,
+                token: jwt.sign(employee, "key")
+            });
         }
     };
+
+    async refresh(req, res) {
+        const { token } = req.body;
+        if(token === undefined){
+            return res.sendStatus(400);
+        }
+        const user = jwt.verify(token, 'key');
+        res.json({user});
+    }
 
     // async updateEmployee(req, res){
     //     const {id, name, val} = req.body;

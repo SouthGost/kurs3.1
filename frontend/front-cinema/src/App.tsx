@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
 import { Routes, Route } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from './reducers/store';
 import { setUser } from './reducers/userSlice';
@@ -14,12 +15,6 @@ export default function App() {
     const dispatch = useAppDispatch();
     //const [user, setUser] = useState<User>(useAppSelector(state => state.user)); 
     const user = useAppSelector(state => state.user.val);
-    // const [user, setUser] = useState<User | undefined>(undefined);
-
-    useEffect(() => {
-        console.log(user);
-    }, [user]);
-
 
     return (
         <div className="App">
