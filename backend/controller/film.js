@@ -2,33 +2,41 @@ const db = require('../db');
 
 class FilmController{
     async createFilm(req, res){
-        const {name, val} = req.body;
+        const {name, img_url, age_limit, description} = req.body;
+        if(
+            name == undefined ||
+            img_url == undefined ||
+            age_limit == undefined ||
+            description == undefined
+        ){
+            return res.sendStatus(400);
+        }
         const newFilm = await db.query(
-            'INSERT INTO test (name, val) values ($1, $2) RETURNING *',
-            [name, val]
+            'INSERT INTO film (name, img_url, age_limit, description) values ($1, $2, $3, $4) RETURNING *',
+            [name, img_url, age_limit, description]
         );
         res.json(newFilm.rows[0]);
     };
 
     async getFilm(req, res){
-        const films = await db.query('SELECT * FROM test');
+        const films = await db.query('SELECT * FROM film');
         res.json(films.rows);
     };
 
     async getOneFilm(req, res){
         const id = req.params.id;
         const film = await db.query(
-            'SELECT * FROM test where id = $1',
+            'SELECT * FROM film where id = $1',
             [id]
         );
         res.json(film.rows[0]);
     };
 
     async updateFilm(req, res){
-        const {id, name, val} = req.body;
+        const {id, name, img_url, age_limit, description} = req.body;
         const film = await db.query(
-            'UPDATE test set name = $1, val = $2 where id = $3 RETURNING *',
-            [name, val, id]
+            'UPDATE film set name = $1, img_url = $2, age_limit = $3, description = $4 where id = $5 RETURNING *',
+            [name, img_url, age_limit, description, id]
         );
         res.json(film.rows[0]);
     };
@@ -36,7 +44,7 @@ class FilmController{
     async deleteFilm(req, res){
         const id = req.params.id;
         const film = await db.query(
-            'DELETE FROM test where id = $1',
+            'DELETE FROM film where id = $1',
             [id]
         );
         res.json({

@@ -19,7 +19,7 @@ const corsOpts = {
 
 app.use(cors(corsOpts));
 app.use(express.json());
-//app.use('/api/film', filmRouter);
+app.use('/api/film', filmRouter);
 app.use('/api/auth', authRouter);
 
 // app.get('/', (req,res) => {

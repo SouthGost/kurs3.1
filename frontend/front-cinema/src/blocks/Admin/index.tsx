@@ -18,15 +18,10 @@ export default function Admin() {
             <Link to="addFilm">
                 add
             </Link>
-            <Routes>
-                <Route path="addFilm" element={<AddFilm />} />
-            </Routes>
-            <p>добавить сеанс</p>
-            <input type="text"></input>
-            <input type="text"></input>
-            <input type="text"></input>
-            <input type="text"></input>
-            <button>добавить</button>
+            {/* <Routes>
+                <Route path="addfilm" element={<AddFilm />} />
+            </Routes> */}
+            <AddFilm />
         </div>
     );
 }
