@@ -10,6 +10,7 @@
 
 .container{
     margin: 50px;
+    padding: 50px;
     width: Calc(100% - 100px);
     border: 1px solid black;
     border-radius: 20px;

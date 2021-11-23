@@ -24,10 +24,10 @@ export default function App() {
                 <Login />
                 :
                 <>
-                    <Space className="navigation" align="end" direction="horizontal">
+                    <Space className="navigation" direction="horizontal">
                         {user.getNavigation()}
                     </Space>
-                    <Space className="container" align="center" direction="vertical">
+                    <Space className="container" align="start" direction="vertical">
                         <Routes>
                             <Route path="/" element={<Sessions />} />
                             <Route path="/admin" element={<Admin />} >

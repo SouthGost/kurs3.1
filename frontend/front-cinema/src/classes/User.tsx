@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 import { immerable } from "immer";
-import { Form, Input, Button, Card, notification, Typography } from 'antd';
+import { Button, Typography } from 'antd';
 const { Text } = Typography;
 
 export default class User {
@@ -26,7 +26,6 @@ export default class User {
     }
 
     protected getDefaultNavigation(elements: JSX.Element) {
-
         return (
             <>
                 <Link to="/">

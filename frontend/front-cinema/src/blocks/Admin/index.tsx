@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { useAppSelector } from '../../reducers/store';
-import { Routes, Route, Link, Outlet  } from 'react-router-dom';
+import { Routes, Route, Link, Outlet } from 'react-router-dom';
+import { Form, Space, Button, Card, notification, Typography } from 'antd';
 import AddFilm from './AddFilm';
+import './style.css';
 
 
 export default function Admin() {
@@ -14,11 +16,22 @@ export default function Admin() {
     }, [user])
 
     return (
-        <div>
-            <Link to="addfilm">
-                add
-            </Link>
-            <Outlet/>
-        </div>
+        <Space align="start" direction="horizontal">
+            <Space className="admin_navigation" direction="vertical">
+                <Link to="addfilm">
+                    <Button className="admin_link">
+                        Добавить фильм
+                    </Button>
+                </Link>
+                <Link to="addfilm">
+                    <Button className="admin_link">
+                        Добавить сеанс
+                    </Button>
+                </Link>
+            </Space>
+            <Space className="admin_container" align="center" direction="vertical">
+                <Outlet />
+            </Space>
+        </Space>
     );
 }

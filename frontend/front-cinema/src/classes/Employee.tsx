@@ -30,7 +30,7 @@ export default class Employee extends User {
         const elements = (
             <Link to="/admin">
                 <Button>
-                    Админская
+                    Рабочая страница
                 </Button>
             </Link>
         );

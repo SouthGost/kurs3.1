@@ -58,7 +58,7 @@ export default function AddFilm() {
     return (
         <Space direction="vertical">
             <Title>Добавить фильм</Title>
-            <Space direction="horizontal">
+            {/* <Space direction="horizontal"> */}
                 <Text>Имя фильма:</Text>
                 <Input
                     type="text"
@@ -66,8 +66,8 @@ export default function AddFilm() {
                         setNameFilm(event.target.value);
                     }}
                 ></Input>
-            </Space>
-            <Space direction="horizontal">
+            {/* </Space>
+            <Space direction="horizontal"> */}
                 <Text>Картинка:</Text>
                 <Input
                     type="text"
@@ -75,8 +75,8 @@ export default function AddFilm() {
                         setImgUrlFilm(event.target.value);
                     }}
                 ></Input>
-            </Space>
-            <Space direction="horizontal">
+            {/* </Space>
+            <Space direction="horizontal"> */}
                 <Text>Возрастное ограничение:</Text>
                 <Input
                     type="text"
@@ -84,8 +84,8 @@ export default function AddFilm() {
                         setAgeLimitFilm(event.target.value);
                     }}
                 ></Input>
-            </Space>
-            <Space direction="horizontal">
+            {/* </Space>
+            <Space direction="horizontal"> */}
                 <Text>Описание:</Text>
                 <Input
                     type="text"
@@ -93,7 +93,7 @@ export default function AddFilm() {
                         setDescriptionFilm(event.target.value);
                     }}
                 ></Input>
-            </Space>
+            {/* </Space> */}
             <Button
                 type="primary"
                 htmlType="submit"
