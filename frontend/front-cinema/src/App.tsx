@@ -8,6 +8,7 @@ import Admin from './blocks/Admin';
 import Login from './blocks/Auth/Login';
 import Sessions from './blocks/Sessions';
 import AddFilm from './blocks/Admin/AddFilm';
+import AddSession from './blocks/Admin/AddSession';
 import { Space } from 'antd';
 import './App.css';
 
@@ -32,6 +33,7 @@ export default function App() {
                             <Route path="/" element={<Sessions />} />
                             <Route path="/admin" element={<Admin />} >
                                 <Route path="addfilm" element={<AddFilm />} />
+                                <Route path="addsession" element={<AddSession />} />
                             </Route>
                             <Route path="*" element={<WrongPage />} />
                         </Routes>

@@ -23,7 +23,7 @@ export default function Admin() {
                         Добавить фильм
                     </Button>
                 </Link>
-                <Link to="addfilm">
+                <Link to="addsession">
                     <Button className="admin_link">
                         Добавить сеанс
                     </Button>

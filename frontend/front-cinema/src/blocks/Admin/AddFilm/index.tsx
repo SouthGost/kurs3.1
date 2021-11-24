@@ -59,7 +59,7 @@ export default function AddFilm() {
         <Space direction="vertical">
             <Title>Добавить фильм</Title>
             {/* <Space direction="horizontal"> */}
-                <Text>Имя фильма:</Text>
+                <Text>Название фильма:</Text>
                 <Input
                     type="text"
                     onChange={(event) => {
