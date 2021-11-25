@@ -36,7 +36,7 @@ export default function AddFilm() {
         };
 
         try {
-            const response = await fetch(`http://localhost:8000/api/film`, params);
+            const response = await fetch(`http://localhost:8000/api/add/film`, params);
             if (response.ok) {
                 const data = await response.json();
 

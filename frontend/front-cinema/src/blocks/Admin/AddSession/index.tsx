@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import Cookies from 'js-cookie';
+import moment from 'moment';
 import { Input, Button, notification, Modal, Typography, Space, Select, DatePicker, Checkbox } from "antd";
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -11,19 +13,21 @@ type halls = {
     id: number,
     name: string
 }[];
+type time = "10:00"| "13:30"| "17:00"| "20:45"| "23:10";
 
 export default function AddSession() {
     const [films, setFilms] = useState<films>();
     const [halls, setHalls] = useState<halls>();
-    const times = ["10:00", "13:30", "17:00", "20:45", "23:10"];
     const [choosedFilm, setChoosedFilm] = useState<number>();
     const [choosedHall, setChoosedHall] = useState<number>();
-    const [choosedDate, setChoosedDate] = useState(1);
-    const [choosedTime, setChoosedTime] = useState(1);
+    const [choosedDate, setChoosedDate] = useState<string|null>(null);
+    const [choosedTime, setChoosedTime] = useState<time>();
     const [choosedD, setChoosedD] = useState(2);
     const [isIMAX, setIsIMAX] = useState(false);
     const [isDolbyAudio, setIsDolbyAudio] = useState(false);
     const [cost, setCost] = useState<number>();
+    const token = Cookies.get("token");
+    const times:time[] = ["10:00", "13:30", "17:00", "20:45", "23:10"];
 
     useEffect(() => {
         async function getInfoForSession() {
@@ -60,7 +64,12 @@ export default function AddSession() {
 
     async function addSession() {
         if (
-            true
+            choosedFilm == undefined ||
+            choosedHall == undefined ||
+            cost == undefined ||
+            choosedDate == null ||
+            choosedTime == undefined ||
+            choosedD == undefined
         ) {
             notification.warning({
                 message: "Ошибка",
@@ -68,19 +77,26 @@ export default function AddSession() {
             });
             return;
         }
-
+        const date = moment(choosedDate, "YYYY-MM-DD").add(choosedTime.split(":")[0], "hours").add(choosedTime.split(":")[1], "minute").format('x');
         const params = {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                //сюда дату
+                film_id: choosedFilm,
+                hall_id: choosedHall,
+                cost,
+                d: choosedD,
+                date,
+                token,
+                palette: isIMAX ? "IMAX" : "default",
+                audio: isDolbyAudio ? "Dolby Audio" : "default",
             }),
         };
 
         try {
-            const response = await fetch(`http://localhost:8000/api/film`, params);
+            const response = await fetch(`http://localhost:8000/api/add/session`, params);
             if (response.ok) {
                 const data = await response.json();
 
@@ -145,15 +161,19 @@ export default function AddSession() {
             <Space direction="horizontal">
                 <DatePicker
                     placeholder="Выберите дату"
+                    disabledDate={(current) => {
+                        return current <= moment();
+                    }}    
                     onChange={(date, dateString) => {
                         console.log(date, dateString);
+                        setChoosedDate(dateString);
                     }}
                 />
                 <Select
                     defaultValue="Выберете время"
                     onChange={(value) => {
                         if (value !== "Выберете время") {
-                            // setChoosedHall(value);
+                            setChoosedTime(value)
                         }
                     }}
                 >
@@ -168,6 +188,9 @@ export default function AddSession() {
             <Space direction="horizontal">
                 <Select
                     defaultValue={2}
+                    onChange={(value) => {
+                        setChoosedD(value)
+                    }}
                 >
                     <Option value={2} key={"2D"}>
                         2D
@@ -177,16 +200,18 @@ export default function AddSession() {
                     </Option>
                 </Select>
                 <Checkbox
-                    // checked={this.state.checked}
-                    // disabled={this.state.disabled}
-                    // onChange={this.onChange}
+                    checked={isIMAX}
+                    onChange={() => {
+                        setIsIMAX(!isIMAX)
+                    }}
                 >
                     IMAX
                 </Checkbox>
                 <Checkbox
-                    // checked={this.state.checked}
-                    // disabled={this.state.disabled}
-                    // onChange={this.onChange}
+                    checked={isDolbyAudio}
+                    onChange={() => {
+                        setIsDolbyAudio(!isDolbyAudio)
+                    }}
                 >
                     Dolby Audio
                 </Checkbox>
@@ -195,8 +220,14 @@ export default function AddSession() {
             <Input
                 type="number"
                 placeholder="Введите цену"
-                onChange={()=>{
-
+                min={0}
+                onChange={(event) => {
+                    const val = +event.target.value;
+                    if (val > 0) {
+                        setCost(val);
+                    } else {
+                        setCost(undefined);
+                    }
                 }}
             />
 

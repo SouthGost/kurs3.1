@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
-const filmRouter = require('./routes/film');
+const addRouter = require('./routes/add');
 const authRouter = require('./routes/auth');
 const infoRouter = require('./routes/info');
 const cors = require('cors');
@@ -20,7 +20,7 @@ const corsOpts = {
 
 app.use(cors(corsOpts));
 app.use(express.json());
-app.use('/api/film', filmRouter);
+app.use('/api/add', addRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/info', infoRouter);
 
