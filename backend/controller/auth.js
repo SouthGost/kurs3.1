@@ -87,7 +87,7 @@ class AuthController {
         }
     };
 
-    async refresh(req, res) {
+    refresh(req, res) {
         const { token } = req.body;
         if(token === undefined){
             return res.sendStatus(400);
