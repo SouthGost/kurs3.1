@@ -39,7 +39,7 @@ export default function AddSession() {
             };
 
             try {
-                const response = await fetch(`http://localhost:8000/api/info/session`, params);
+                const response = await fetch(`http://localhost:8000/api/info/forSession`, params);
                 if (response.ok) {
                     const data = await response.json();
                     setFilms(data.films);

@@ -42,18 +42,18 @@ class AddController{
                 if (viewType == undefined) {
                     throw new Error("Не правильные данные типа показа");
                 }
-                console.log(viewType);
-                // const newSession = await db.query(
-                //     'INSERT INTO session (film_id, hall_id, cost, view_type_id, date) values ($1, $2, $3, $4) RETURNING *',
-                //     [film_id, hall_id, cost, viewType.id, date]
-                // );
+                const newSession = await db.query(
+                    'INSERT INTO session (film_id, hall_id, cost, view_type_id, date) values ($1, $2, $3, $4, $5) RETURNING *',
+                    [film_id, hall_id, cost, viewType.id, date]
+                );
+                console.log(newSession);
                 return res.json({message: "dobro"});
             }
-            console.log(film_id);
-            console.log(hall_id);
-            console.log(cost);
-            console.log(d);
-            console.log(user.position);
+            // console.log(film_id);
+            // console.log(hall_id);
+            // console.log(cost);
+            // console.log(d);
+            // console.log(user.position);
             return res.sendStatus(400);
         }catch(e){
             console.log(e.message);
