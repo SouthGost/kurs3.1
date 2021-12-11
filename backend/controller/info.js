@@ -1,4 +1,5 @@
 const db = require('../db');
+const moment = require('moment');
 
 class InfoController {
     // checkEmployee(login){
@@ -48,12 +49,22 @@ class InfoController {
 
     async sessions(req,res) {
         const { film_id, date } = req.body;
-        const date2 = date + 86400000;
+        const date1 = moment(moment(date,'x').format("DD-MM-YY"),"DD-MM-YY");
+        const date2 = moment(date1).add(1,"days");
         const sessions = (await db.query(
             'SELECT * FROM session where film_id = $1 AND date > $2 AND date < $3',
-            [film_id, date, date2]
+            [film_id, date1.format('x'), date2.format('x')]
         )).rows;
+        console.log(date1);
+        console.log(date2);
+        console.log(sessions.length);
+        console.log("123------------------");
         res.json({sessions});
+
+        // res.json({
+        //     date1: date1.format("DD-MM-YY"),
+        //     date2: date2.format("DD-MM-YY")
+        // });
     }
 
     async films(req,res){
@@ -72,6 +83,43 @@ class InfoController {
         )).rows;
         res.json({films , halls});
     };
+
+    async checkDates(req, res){
+        const {hall_id} = req.body;
+        const sessions = (await db.query(
+            'SELECT * FROM session where hall_id = $1',
+            [hall_id]
+        )).rows;
+        console.log(sessions); //    
+        const dates = [];
+        sessions.forEach((session)=>{
+            console.log(moment(session.date,'x'))
+            const date = new moment(session.date, "x");
+            const index = dates.findIndex((elem,id) => {
+                if(elem.date == date.format("YYYY-MM-DD")){
+                    console.log(id)
+                    return id;
+                }
+            })
+            console.log(index)
+            if (index === -1) {
+                dates.push({
+                    date: date.format("YYYY-MM-DD"),
+                    times: [`${date.format("HH:mm")}`],
+                });
+            } else {
+                dates[index].times.push(date.format("HH:mm"));
+            }
+            // console.log(date.format("YYYY-MM-DD"));
+            // console.log(date.format("hh:mm"));
+            // if(dates[date.format("YYYY-MM-DD")] === undefined){
+            //     dates[date.format("YYYY-MM-DD")] = []
+            // }
+            // dates[date.format("YYYY-MM-DD")].push(date.format("HH:mm")); 
+            console.log(dates);
+        });
+        res.json({dates});
+    }
 
 };
 

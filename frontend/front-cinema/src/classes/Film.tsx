@@ -1,6 +1,9 @@
 import ResFilm from "../interfaces/IResFilm";
 import ResSession from '../interfaces/IResSession';
 import Session from './Session';
+import { Space } from "antd";
+import moment from 'moment';
+
 
 export default class Film{
     private sessions: Session[];
@@ -13,7 +16,7 @@ export default class Film{
 
     public constructor(
         film:ResFilm,
-        date:number = 0
+        date:moment.Moment
     ){
         this.id = film.id;
         this.name = film.name;
@@ -22,15 +25,10 @@ export default class Film{
         this.description = film.description;
         this.posterUrl = film.posterUrl;
         this.sessions = [];
-        if(date = 0){
-            const today = new Date();
-            this.setSessions(new Date(today.getFullYear(), today.getMonth(), today.getDate(), 5).getTime());
-        }else {
-            this.setSessions(date);
-        }
+        this.loadSessions(date);
     }
 
-    async setSessions(date:number){
+    async loadSessions(date:moment.Moment){
         const params = {
             method: "POST",
             headers: {
@@ -38,7 +36,7 @@ export default class Film{
             },
             body: JSON.stringify({
                 film_id: this.id,
-                date,
+                date: date.format('x'),
             }),
         };
 
@@ -63,23 +61,41 @@ export default class Film{
         });
     }
 
-    getName():string {
-        return this.name;
+    public getContent(){
+        return(
+            <Space direction="horizontal">
+                <Space direction="vertical">
+                    <div>
+                        {this.name}
+                    </div>
+                    <div>
+                        {this.description}
+                    </div>
+                </Space>
+                {this.sessions.map((session)=>
+                    session.getContent()
+                )}
+            </Space>
+        )
     }
 
-    getAgeLimit():string {
-        return this.ageLimit;
-    }
+    // getName():string {
+    //     return this.name;
+    // }
 
-    getGenre():string[] {
-        return this.genre;
-    }
+    // getAgeLimit():string {
+    //     return this.ageLimit;
+    // }
 
-    getDescription():string {
-        return this.description;
-    }
+    // getGenre():string[] {
+    //     return this.genre;
+    // }
 
-    getPosterUrl():string {
-        return this.posterUrl;
-    }
+    // getDescription():string {
+    //     return this.description;
+    // }
+
+    // getPosterUrl():string {
+    //     return this.posterUrl;
+    // }
 }

@@ -2,6 +2,8 @@ import Place from "./Place";
 import ResPlace from "../interfaces/IResPlace";
 import ResTicket from "../interfaces/IResTicket";
 import ResSession from "../interfaces/IResSession";
+import moment from 'moment';
+import { Space } from "antd";
 
 export default class Session {
     private places: Place[];
@@ -10,17 +12,17 @@ export default class Session {
     private hall_id: number;
     private cost: number;
     private view_type_id: number;
-    private date: number;
+    private date: moment.Moment;
 
     public constructor(
-        session:ResSession
+        session: ResSession
     ) {
         this.id = session.id;
         this.film_id = session.film_id;
         this.hall_id = session.hall_id;
         this.cost = session.cost;
         this.view_type_id = session.view_type_id;
-        this.date = session.date;
+        this.date = moment(session.date, "x");
         this.places = [];
     }
 
@@ -62,6 +64,19 @@ export default class Session {
                 this.places.push(new Place(place.row, place.number, "free"));
             }
         });
+    }
+
+    public getContent() {
+        return (
+            <Space direction="vertical">
+                <div>
+                    {this.date.format("HH:mm")}
+                </div>
+                <div>
+                    {this.cost}
+                </div>
+            </Space>
+        )
     }
 
 }

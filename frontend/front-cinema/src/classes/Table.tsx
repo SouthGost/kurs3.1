@@ -1,23 +1,28 @@
 import Film from './Film';
 import ResFilm from '../interfaces/IResFilm';
+import moment from 'moment';
+import { Space } from "antd";
 
 
 export default class Table {
-    private date: number;
+    private date: moment.Moment;
     private films: Film[];
+    private errors: string ="";
 
-    public constructor(date: number = 0) {
-        if(date = 0){
-            const today = new Date();
-            this.date = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 5).getTime();
-        } else{
-            this.date = date;
-        }
+    public constructor(date: moment.Moment) {
+        this.date = date;
         this.films = [];
+        this.loadFilms();
     }
 
-    async setFilms(date: number) {
+    public setDate(date: moment.Moment){
         this.date = date;
+        this.films.forEach(film => {
+            film.loadSessions(date);
+        });
+    }
+
+    private async loadFilms() {
         const params = {
             method: "POST",
             headers: {
@@ -32,10 +37,12 @@ export default class Table {
                 this.setFilms_(data.films);
                 console.log(data);
             } else {
-                throw new Error("Не найдены фильмы");
+                this.errors = "Не найдены фильмы";
+                // throw new Error("Не найдены фильмы");
             }
         } catch (err) {
-            throw new Error("У нас что-то происходит не так. Подождите немного.");
+            this.errors = "У нас что-то происходит не так. Подождите немного.";
+            // throw new Error("У нас что-то происходит не так. Подождите немного.");
         }
     }
 
@@ -44,5 +51,23 @@ export default class Table {
         films.forEach((film) => {
             this.films.push(new Film(film, this.date));
         })
+    }
+
+    public getContent(date: moment.Moment){
+        this.setDate(date);
+
+        return(
+            <Space direction="vertical">
+                {this.errors !== ""?
+                    <p>this.errors</p>
+                :
+                    <></>
+                }
+                Сеансы на {this.date.format("DD-MM-YY")}
+                {this.films.map((film) =>
+                    film.getContent()
+                )}
+            </Space>
+        )
     }
 }

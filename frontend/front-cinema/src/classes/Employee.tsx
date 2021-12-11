@@ -1,25 +1,25 @@
 import User from "./User";
 import { Link } from "react-router-dom";
+import IResEmployee from '../interfaces/IResEmployee';
 import { Form, Input, Button, Card, notification, Typography } from 'antd';
 const { Text } = Typography;
 
 export default class Employee extends User {
-    private fio: string;
+    private name: string;
     private position: string;
+    private surname: string;
+    private patronymic: string;
 
-    public constructor(
-        login: string,
-        password: string,
-        fio: string,
-        position: string,
-    ) {
-        super(login, password);
-        this.fio = fio;
-        this.position = position;
+    public constructor(employee: IResEmployee) {
+        super(employee);//{login: employee.login, password:employee.password}
+        this.name = employee.name;
+        this.position = employee.position;
+        this.surname = employee.surname;
+        this.patronymic = employee.patronymic;
     }
 
     getFio(): string {
-        return this.fio;
+        return this.name;
     }
 
     getPosition() {

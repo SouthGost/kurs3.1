@@ -13,26 +13,32 @@ type halls = {
     id: number,
     name: string
 }[];
-type time = "10:00"| "13:30"| "17:00"| "20:45"| "23:10";
+type time = "10:00" | "13:30" | "17:00" | "20:45" | "23:10";
+type busyDate = {
+    date: string,
+    times: time[],
+}[]
 
 export default function AddSession() {
     const [films, setFilms] = useState<films>();
     const [halls, setHalls] = useState<halls>();
+    const [busyDates, setBusyDates] = useState<busyDate>();
+    const [busyTimes, setBusyTimes] = useState<time[]>();
     const [choosedFilm, setChoosedFilm] = useState<number>();
     const [choosedHall, setChoosedHall] = useState<number>();
-    const [choosedDate, setChoosedDate] = useState<string|null>(null);
+    const [choosedDate, setChoosedDate] = useState<string | null>(null);
     const [choosedTime, setChoosedTime] = useState<time>();
     const [choosedD, setChoosedD] = useState(2);
     const [isIMAX, setIsIMAX] = useState(false);
     const [isDolbyAudio, setIsDolbyAudio] = useState(false);
     const [cost, setCost] = useState<number>();
     const token = Cookies.get("token");
-    const times:time[] = ["10:00", "13:30", "17:00", "20:45", "23:10"];
+    const times: time[] = ["10:00", "13:30", "17:00", "20:45", "23:10"];
 
     useEffect(() => {
         async function getInfoForSession() {
             const params = {
-                method: "GET",
+                method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -61,6 +67,43 @@ export default function AddSession() {
 
         getInfoForSession();
     }, []);
+
+    useEffect(() => {
+        async function checkDates() {
+            const params = {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    hall_id: choosedHall,
+                })
+            };
+
+            try {
+                const response = await fetch(`http://localhost:8000/api/info/checkdates`, params);
+                if (response.ok) {
+                    const data = await response.json();
+                    setBusyDates(data.dates);
+                } else {
+                    Modal.error({
+                        title: 'Ошибка',
+                        content: 'У нас что-то происходит не так. Подождите немного.',
+                    });
+                }
+            } catch (err) {
+                Modal.error({
+                    title: 'Ошибка',
+                    content: 'У нас что-то происходит не так. Подождите немного.',
+                });
+            }
+        }
+
+        if (choosedHall !== undefined) {
+            checkDates();
+        }
+
+    }, [choosedHall]);
 
     async function addSession() {
         if (
@@ -160,16 +203,39 @@ export default function AddSession() {
             <Text>Дата:</Text>
             <Space direction="horizontal">
                 <DatePicker
+                    disabled={busyDates === undefined}
                     placeholder="Выберите дату"
                     disabledDate={(current) => {
-                        return current <= moment();
-                    }}    
+                        // if(current <= moment()){
+                        //     return true
+                        // }
+                        // if (busyDates !== undefined) {
+                            const busyDate = busyDates!.find((elem) => {
+                                return elem.date === current.format("YYYY-MM-DD")
+                            })
+                            if (busyDate !== undefined) {
+                                if (busyDate.times.length === 5) {
+                                    return true
+                                }
+                            }
+                        // }
+                        return false
+                    }}
                     onChange={(date, dateString) => {
                         console.log(date, dateString);
+                        const busyDate = busyDates!.find(elem => {
+                            return elem.date === dateString
+                        })
+                        if(busyDate !== undefined){
+                            setBusyTimes(busyDate.times);
+                        } else {
+                            setBusyTimes([]);
+                        }
                         setChoosedDate(dateString);
                     }}
                 />
                 <Select
+                    disabled={busyTimes === undefined}
                     defaultValue="Выберете время"
                     onChange={(value) => {
                         if (value !== "Выберете время") {
@@ -177,11 +243,25 @@ export default function AddSession() {
                         }
                     }}
                 >
-                    {times!.map((elem) => (
-                        <Option value={elem} key={elem}>
-                            {elem}
-                        </Option>
-                    ))}
+                    {times!.map((time) => {
+                        let busy = false;
+
+                        let busyTime = undefined;
+                        if(busyTimes !== undefined){
+                            busyTime = busyTimes.find(bt => {
+                                return bt === time
+                            })
+                        }
+                        if(busyTime === undefined){
+                            busy = true;
+                        }
+
+                        return(
+                            <Option disabled={busy} value={time} key={time}>
+                                {time}
+                            </Option>
+                        )
+                    })}
                 </Select>
             </Space>
             <Text>Тип показа:</Text>

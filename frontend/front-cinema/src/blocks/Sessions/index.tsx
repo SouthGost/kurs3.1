@@ -1,13 +1,20 @@
-import { useState } from 'react';
-import Session from "./Session";
+import { useState, useMemo, useEffect } from 'react';
+import Table from '../../classes/Table';
 import User from '../../classes/User';
 import Employee from '../../classes/Employee';
-import { Modal } from 'antd';
+import { Modal, DatePicker, Space } from 'antd';
 import Film from '../../classes/Film';
+import moment from 'moment';
 
 export default function Sessions() {
+    const [choosedDate, setChoosedDate] = useState(moment());
     const [choosedSession, setChoosedSession] = useState<Film | false>(false);
-    
+    const table = useMemo( () => new  Table(choosedDate) ,[]);
+
+    useEffect(() =>{
+        // table.setDate(choosedDate);
+        console.log(choosedDate);
+    }, [choosedDate])
 
     // const data = [
     //     new Film(
@@ -34,11 +41,17 @@ export default function Sessions() {
     // ];
 
     return (
-        <div>
-            {/* {data.map(elem => (
-                <Session film={elem} setChoosedSession={setChoosedSession} />
-            ))} */}
-            <Modal
+        <Space direction="vertical">
+            <DatePicker
+                    value={choosedDate}
+                    allowClear={false}
+                    onChange={(date, dateString) => {
+                        console.log(date, dateString);
+                        setChoosedDate(date!);
+                    }}
+                />
+            {table.getContent(choosedDate)}
+            {/* <Modal
                 title={choosedSession !== false ? choosedSession.getName() : true}
                 visible={choosedSession === false ? false : true}
                 onOk={() => setChoosedSession(false)}
@@ -48,7 +61,7 @@ export default function Sessions() {
                 <p>some contents..</p>
                 <p>some contents..</p>
                 <p>some contents..</p>
-            </Modal>
-        </div>
+            </Modal> */}
+        </Space>
     );
 };

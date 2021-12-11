@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from "react-router-dom";
 import { immerable } from "immer";
+import IResUser from '../interfaces/IResUser';
 import { Button, Typography } from 'antd';
 const { Text } = Typography;
 
@@ -9,12 +10,9 @@ export default class User {
     protected login: string;
     protected password: string;
 
-    public constructor(
-        login: string,
-        password: string,
-    ) {
-        this.login = login;
-        this.password = password;
+    public constructor(user: IResUser) {
+        this.login = user.login;
+        this.password = user.password;
     }
 
     getPosition() {

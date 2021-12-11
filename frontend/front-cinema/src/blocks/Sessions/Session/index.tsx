@@ -10,7 +10,7 @@ export default function Session(props:ISession) {
 
     return (
         <div className="session">
-            <img src="/" alt={props.film.getPosterUrl()} />
+            {/* <img src="/" alt={props.film.getPosterUrl()} />
             <p>{props.film.getName()}</p>
             <p>{props.film.getAgeLimit()}</p>
             <p>{props.film.getGenre()}</p>
@@ -18,7 +18,7 @@ export default function Session(props:ISession) {
             <p>{props.film.getPosterUrl()}</p>
             <button onClick={() => {
                 props.setChoosedSession(props.film);
-            }}>Купить билет</button>
+            }}>Купить билет</button> */}
         </div>
     );
 }
