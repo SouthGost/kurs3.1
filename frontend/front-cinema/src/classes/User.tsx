@@ -15,7 +15,7 @@ export default class User {
         this.password = user.password;
     }
 
-    getPosition() {
+    public getPosition() {
         return "User";
     }
 
@@ -26,11 +26,6 @@ export default class User {
     protected getDefaultNavigation(elements: JSX.Element) {
         return (
             <>
-                <Link to="/">
-                    <Button>
-                        Главная
-                    </Button>
-                </Link>
                 {elements}
                 <Button>
                     {this.login}

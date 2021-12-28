@@ -1,73 +1,88 @@
 import Film from './Film';
 import ResFilm from '../interfaces/IResFilm';
 import moment from 'moment';
-import { Space } from "antd";
-
+import { Modal, Space, Typography } from "antd";
+import Place from './Place';
+import User from './User';
+import Session from './Session';
+const { Text } = Typography;
 
 export default class Table {
     private date: moment.Moment;
     private films: Film[];
-    private errors: string ="";
+    private user: User;
 
-    public constructor(date: moment.Moment) {
+    private constructor(
+        date: moment.Moment,
+        films: ResFilm[],
+        showModal: (title: string, elem: JSX.Element) => void,
+        user: User
+        // changeChoosedPlace: (action: string, place: Place) => void
+    ) {
         this.date = date;
         this.films = [];
-        this.loadFilms();
-    }
-
-    public setDate(date: moment.Moment){
-        this.date = date;
-        this.films.forEach(film => {
-            film.loadSessions(date);
-        });
-    }
-
-    private async loadFilms() {
-        const params = {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        };
-
-        try {
-            const response = await fetch(`http://localhost:8000/api/info/films`, params);
-            if (response.ok) {
-                const data = await response.json();
-                this.setFilms_(data.films);
-                console.log(data);
-            } else {
-                this.errors = "Не найдены фильмы";
-                // throw new Error("Не найдены фильмы");
-            }
-        } catch (err) {
-            this.errors = "У нас что-то происходит не так. Подождите немного.";
-            // throw new Error("У нас что-то происходит не так. Подождите немного.");
-        }
-    }
-
-    private setFilms_(films: ResFilm[]) {
-        this.films = [];
+        this.user = user;
         films.forEach((film) => {
-            this.films.push(new Film(film, this.date));
+            this.films.push(new Film(film, /*this.date,*/ showModal));
+        })
+
+    }
+
+    public static async createTable(
+        date: moment.Moment,
+        showModal: (title: string, elem: JSX.Element) => void,
+        user: User
+        // changeChoosedPlace: (action: string, place: Place) => void
+    ) {
+        const films = await Film.loadFilms()
+        return new Table(date, films, showModal, user);
+    }
+
+    public setUser(user: User){
+        this.user = user;
+        this.films.forEach((film) => {
+            film.setUser(user);
         })
     }
 
-    public getContent(date: moment.Moment){
-        this.setDate(date);
+    public getUser(){
+        return this.user;
+    }
 
-        return(
-            <Space direction="vertical">
-                {this.errors !== ""?
-                    <p>this.errors</p>
-                :
-                    <></>
-                }
-                Сеансы на {this.date.format("DD-MM-YY")}
-                {this.films.map((film) =>
-                    film.getContent()
-                )}
-            </Space>
-        )
+    public getDate() {
+        return this.date;
+    }
+
+    public async getContent(date: moment.Moment) {
+        const previousDate = this.date;
+        try{
+            this.date = date;
+            for (const film of this.films) {
+                await film.setSessions(await Session.loadSessions(date, film.getId()));
+            }
+    
+            return (
+                <Space 
+                    direction="vertical"
+                    size={30}
+                >
+                    <Text>Сеансы на {this.date.format("DD-MM-YY")}</Text>
+                    {this.films.map((film) =>
+                        film.getContent()
+                    )}
+                </Space>
+            )
+        } catch(error){
+            this.date = previousDate;
+
+            return(
+                <Space 
+                    direction="vertical"
+                    size={30}
+                >
+                    <Text>Подождите немного. У нас проблемы.</Text>
+                </Space>
+            )
+        }
     }
 }

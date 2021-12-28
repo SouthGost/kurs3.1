@@ -2,10 +2,10 @@ const Router = require('express');
 const router = new Router();
 const addController = require('../controller/add');
 
-router.post('/film', addController.createFilm);//swap createSession
+router.post('/film', addController.addFilm);//swap createSession
 router.post('/session', addController.createSession);
-// router.get('/', addController.getFilm);
-// router.get('/:id', addController.getOneFilm);
+router.post('/tickets', addController.addTickets);
+// router.get('/update', addController.update);
 // router.put('/', addController.updateFilm);
 // router.delete('/:id', addController.deleteFilm);
 

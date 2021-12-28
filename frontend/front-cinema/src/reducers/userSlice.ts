@@ -4,7 +4,7 @@ import Employee from '../classes/Employee';
 
 const initialState:{val:User} = {
     // val: new Employee("admin","123","proger","admin"),
-    val: new User("",""),
+    val: new User({login: "", password: ""}),
 }
 
 const userSlice = createSlice({

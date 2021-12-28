@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import { Link } from 'react-router-dom';
 import { useAppDispatch } from '../../../reducers/store';
 import { setUser } from '../../../reducers/userSlice';
 import User from '../../../classes/User';
@@ -8,19 +7,19 @@ import Employee from '../../../classes/Employee';
 import { Form, Input, Button, Space, notification, Modal, Typography } from 'antd';
 const { Title } = Typography;
 
-export default function Login() {
+export default function Register() {
     const dispatch = useAppDispatch();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [token, setToken] = useState(Cookies.get("token"));
 
-    useEffect(() => {
-        if (token !== undefined) {
+    useEffect(()=>{
+        if(token !== undefined){
             window.location.replace("http://localhost:3000/");
         }
     }, [token])
 
-    async function authentication() {
+    async function reg() {
         if (login === "" || password === "") {
             notification.warning({
                 message: "Ошибка",
@@ -41,21 +40,21 @@ export default function Login() {
         };
 
         try {
-            const response = await fetch(`http://localhost:8000/api/auth/login`, params);
+            const response = await fetch(`http://localhost:8000/api/auth/register`, params);
             if (response.ok) {
                 const data = await response.json();
                 if (data.user.position !== undefined) {
                     dispatch(setUser(new Employee(data.user)));
                 } else {
                     dispatch(setUser(new User(data.user)));
-
+                    
                 }
                 Cookies.set("token", data.token, { expires: 7 });
                 window.location.replace("http://localhost:3000/");
             } else {
                 notification.warning({
                     message: "Ошибка",
-                    description: "Не верный логин или пароль",
+                    description: "Нельзя создать такого пользователя",
                 });
             }
         } catch (err) {
@@ -74,7 +73,7 @@ export default function Login() {
                     placeItems: "center",
                 }}>
                     <Form layout="vertical">
-                        <Title>Вход</Title>
+                        <Title>Регистрация</Title>
                         <Form.Item label="Имя пользователя">
                             <Input
                                 type="text"
@@ -96,15 +95,10 @@ export default function Login() {
                                 type="primary"
                                 htmlType="submit"
                                 onClick={() => {
-                                    authentication();
+                                    reg();
                                 }}
-                            >Войти</Button>
+                            >Зарегестрироваться</Button>
                         </Form.Item>
-                        <Link to="/register">
-                            <Button>
-                                Регистрация
-                            </Button>
-                        </Link>
                     </Form>
                 </Space>
                 :

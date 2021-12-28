@@ -10,7 +10,7 @@ export default function Admin() {
     const user = useAppSelector(state => state.user.val);
 
     useEffect(() => {
-        if (user.getPosition() === "User") {
+        if (user.getPosition() === "User" && user.getLogin() !== "") {
             window.location.replace("http://localhost:3000/");
         }
     }, [user])
@@ -26,6 +26,16 @@ export default function Admin() {
                 <Link to="addsession">
                     <Button className="admin_link">
                         Добавить сеанс
+                    </Button>
+                </Link>
+                <Link to="addemployee">
+                    <Button className="admin_link">
+                        Добавить работника
+                    </Button>
+                </Link>
+                <Link to="editfilms">
+                    <Button className="admin_link">
+                        Изменить фильмы
                     </Button>
                 </Link>
             </Space>

@@ -20,6 +20,7 @@ type busyDate = {
 }[]
 
 export default function AddSession() {
+    const [isDisableButton, setIsDisableButton] = useState(false);
     const [films, setFilms] = useState<films>();
     const [halls, setHalls] = useState<halls>();
     const [busyDates, setBusyDates] = useState<busyDate>();
@@ -54,51 +55,52 @@ export default function AddSession() {
                 } else {
                     Modal.error({
                         title: 'Ошибка',
-                        content: 'У нас что-то происходит не так. Подождите немного.',
+                        content: 'У нас проблемы. Подождите немного.',
                     });
                 }
             } catch (err) {
                 Modal.error({
                     title: 'Ошибка',
-                    content: 'У нас что-то происходит не так. Подождите немного.',
+                    content: 'У нас проблемы. Подождите немного.',
                 });
             }
         }
 
         getInfoForSession();
     }, []);
+    
+    async function checkDates() {
+        const params = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                hall_id: choosedHall,
+            })
+        };
 
-    useEffect(() => {
-        async function checkDates() {
-            const params = {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    hall_id: choosedHall,
-                })
-            };
-
-            try {
-                const response = await fetch(`http://localhost:8000/api/info/checkdates`, params);
-                if (response.ok) {
-                    const data = await response.json();
-                    setBusyDates(data.dates);
-                } else {
-                    Modal.error({
-                        title: 'Ошибка',
-                        content: 'У нас что-то происходит не так. Подождите немного.',
-                    });
-                }
-            } catch (err) {
+        try {
+            const response = await fetch(`http://localhost:8000/api/info/checkdates`, params);
+            if (response.ok) {
+                const data = await response.json();
+                await setBusyDates(data.dates);
+                // setBusyTimes(busyDate.times);
+            } else {
                 Modal.error({
                     title: 'Ошибка',
-                    content: 'У нас что-то происходит не так. Подождите немного.',
+                    content: 'У нас проблемы. Подождите немного.',
                 });
             }
+        } catch (err) {
+            Modal.error({
+                title: 'Ошибка',
+                content: 'У нас проблемы. Подождите немного.',
+            });
         }
+    }
 
+    useEffect(() => {
         if (choosedHall !== undefined) {
             checkDates();
         }
@@ -107,12 +109,12 @@ export default function AddSession() {
 
     async function addSession() {
         if (
-            choosedFilm == undefined ||
-            choosedHall == undefined ||
-            cost == undefined ||
-            choosedDate == null ||
-            choosedTime == undefined ||
-            choosedD == undefined
+            choosedFilm === undefined ||
+            choosedHall === undefined ||
+            cost === undefined ||
+            choosedDate === null ||
+            choosedTime === undefined ||
+            choosedD === undefined
         ) {
             notification.warning({
                 message: "Ошибка",
@@ -142,18 +144,23 @@ export default function AddSession() {
             const response = await fetch(`http://localhost:8000/api/add/session`, params);
             if (response.ok) {
                 const data = await response.json();
-
-                console.log(data);
+                // checkDates();
+                Modal.success({
+                    title: "Сеанс добавлен",
+                });
             } else {
-                notification.warning({
-                    message: "Отказано",
-                    description: "Вы не правильно",
+                // checkDates();
+                setIsDisableButton(false);
+                Modal.warning({
+                    title: "Отказано",
+                    content: "Вы не правильно ввели данные",
                 });
             }
         } catch (err) {
+            setIsDisableButton(false);
             Modal.error({
                 title: 'Ошибка',
-                content: 'У нас что-то происходит не так. Подождите немного.',
+                content: 'У нас проблемы. Подождите немного.',
             });
         }
     }
@@ -252,7 +259,7 @@ export default function AddSession() {
                                 return bt === time
                             })
                         }
-                        if(busyTime === undefined){
+                        if(busyTime !== undefined){
                             busy = true;
                         }
 
@@ -314,7 +321,9 @@ export default function AddSession() {
             <Button
                 type="primary"
                 htmlType="submit"
+                disabled={isDisableButton}
                 onClick={() => {
+                    setIsDisableButton(true);
                     addSession();
                 }}
             >добавить</Button>

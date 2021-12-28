@@ -1,23 +1,95 @@
-export default class Place{
-    private row:number;
-    private number:number;
-    private state:string;
+import { Button, Tooltip } from "antd";
+import ResPlaces from "../interfaces/IResPlace";
+import PlaceCategory from './PlaceCategory';
+
+export default class Place {
+    private id: number;
+    private row: number;
+    private number: number;
+    private state: string;
+    private sessionCost: number;
+    private placeCategory: PlaceCategory;//-------
+    private showModal: () => void;
+    // private changeChoosedPlace: (action: string, place: Place) => void
 
     public constructor(
-        row:number,
-        number:number,
-        state:string
-    ){
-        this.row = row;
-        this.number = number;
+        sessionCost: number,
+        place: ResPlaces,
+        placeCategory: PlaceCategory,
+        showModal: () => void,
+        // changeChoosedPlace: (action: string, place: Place) => void
+    ) {
+        this.id = place.id;
+        this.row = place.row;
+        this.number = place.number;
+        this.state = "free";
+        this.sessionCost = sessionCost;
+        this.placeCategory = placeCategory;
+        this.showModal = showModal;
+        // this.changeChoosedPlace = changeChoosedPlace;
+    }
+
+    // public static async createPlace(
+    //     sessionCost: number,
+    //     place: ResPlaces,
+    //     showModal: () => void,
+    //     changeChoosedPlace: (action: string, place: Place) => void
+    // ) {
+    //     return new Place(
+    //         sessionCost,
+    //         place,
+    //         await PlaceCategory.createCategory(place.place_category_id),
+    //         showModal,
+    //         changeChoosedPlace
+    //     );
+    // }
+
+    public setState(state: string) {
         this.state = state;
     }
 
-    getRow(){
-        return this.row;
+    public getState() {
+        return this.state;
     }
 
-    getNumber(){
-        return this.number;
+    public getId() {
+        return this.id;
     }
+
+    public getCost() {
+        return this.sessionCost * this.placeCategory.getCoefficent();
+    }
+
+    public getContent() {
+        return (
+            <Tooltip title={this.state !== "busy" ? `${this.placeCategory.getName()} ${this.getCost()}` : ""}>
+                <Button
+                    style={{
+                        backgroundColor: this.placeCategory.getBGColor(this.state),
+                        color: "black"
+                    }}
+                    disabled={this.state === "busy"}
+                    danger={this.state === "busy"}
+                    onClick={() => {
+                        if (this.state === "free") {
+                            this.state = "choosed"
+                        } else {
+                            this.state = "free"
+                        }
+                        this.showModal();
+                    }}
+                >
+                    {this.number}
+                </Button>
+            </Tooltip>
+        )
+    }
+
+    // public getRow(){
+    //     return this.row;
+    // }
+
+    // public getNumber(){
+    //     return this.number;
+    // }
 }

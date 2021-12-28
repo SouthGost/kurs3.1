@@ -1,10 +1,11 @@
+import IGenre from './IGenre';
+
 interface ResFilm {
     id: number;
     name: string,
-    ageLimit: string,
-    genre: string[],
+    age_limit: string,
+    genres: IGenre[],
     description: string,
-    posterUrl: string,
 };
 
 export default ResFilm;
