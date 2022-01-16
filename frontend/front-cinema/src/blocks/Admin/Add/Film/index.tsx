@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import FetchRequest from "../../../../classes/FetchRequest";
 import { Input, Button, notification, Modal, Typography, Space, Select, Tag } from "antd";
 import Cookies from "js-cookie";
+import TextArea from "antd/lib/input/TextArea";
 const { Text, Title } = Typography;
 const { Option } = Select;
 type genre = {
@@ -9,48 +11,28 @@ type genre = {
 }
 
 export default function AddFilm() {
-    const [isDisableButton, setIsDisableButton] = useState(false);
+    const [isDisableSubmitButton, setIsDisableSubmitButton] = useState(false);
+    const [isVisibleRefreshButton, setIsVisibleRefreshButton] = useState(false);
     const [nameFilm, setNameFilm] = useState("");
     const [genres, setGenres] = useState<genre[]>();
     const [choosedGenres, setChoosedGenres] = useState<number[]>([]);
-    const [ageLimitFilm, setAgeLimitFilm] = useState<number>();
+    const [ageLimitFilm, setAgeLimitFilm] = useState<number>(0);
     const [descriptionFilm, setDescriptionFilm] = useState("");
     const token = Cookies.get("token");
 
-
-    // useEffect(() => {
-    //     if (imgFilm !== null) {
-    //         console.log(imgFilm);
-    //     }
-    // }, [imgFilm])
-
     useEffect(() => {
+
+
         async function getGenres() {
-            const params = {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            };
-
             try {
-                const response = await fetch(`http://localhost:8000/api/info/genres`, params);
-                if (response.ok) {
-                    const data = await response.json();
-                    setGenres(data.genres);
-
-                } else {
-                    Modal.error({
-                        title: 'Ошибка',
-                        content: 'У нас проблемы. Подождите немного.',
-                    });
-                }
+                setGenres(await FetchRequest.getGenres());
             } catch (err) {
                 Modal.error({
                     title: 'Ошибка',
                     content: 'У нас проблемы. Подождите немного.',
                 });
             }
+            
         }
 
         getGenres();
@@ -63,7 +45,7 @@ export default function AddFilm() {
             ageLimitFilm === undefined ||
             descriptionFilm === ""
         ) {
-            setIsDisableButton(false);
+            setIsDisableSubmitButton(false);
             notification.warning({
                 message: "Ошибка",
                 description: "Вы не полностью ввели данные",
@@ -89,18 +71,19 @@ export default function AddFilm() {
             const response = await fetch(`http://localhost:8000/api/add/film`, params);
             if (response.ok) {
                 const data = await response.json();
+                setIsVisibleRefreshButton(true);
                 Modal.success({
                     title: "Фильм добавлен",
                 });
             } else {
-                setIsDisableButton(false);
+                setIsDisableSubmitButton(false);
                 Modal.warning({
                     title: "Отказано",
                     content: "Вы не правильно ввели данные",
                 });
             }
         } catch (err) {
-            setIsDisableButton(false);
+            setIsDisableSubmitButton(false);
             Modal.error({
                 title: 'Ошибка',
                 content: 'У нас проблемы. Подождите немного.',
@@ -112,39 +95,24 @@ export default function AddFilm() {
     return (
         <Space direction="vertical">
             <Title>Добавить фильм</Title>
-            {/* <Space direction="horizontal"> */}
             <Text>Название фильма:</Text>
             <Input
                 type="text"
+                value={nameFilm}
+                disabled={isDisableSubmitButton}
                 onChange={(event) => {
                     setNameFilm(event.target.value);
                 }}
             ></Input>
             <Text>Добавьте жанр:</Text>
-            <Space direction="horizontal">
-                {genres !== undefined ?
-                    choosedGenres.map(elem => {
-                        const genre = genres.find(genre_ => elem === genre_.id)
-                        return (
-                            <Button
-                                onClick={() => {
-                                    setChoosedGenres(
-                                        choosedGenres.filter((filterElem) => {
-                                            if (filterElem !== elem) {
-                                                return elem;
-                                            };
-                                        })
-                                    )
+            <Space
+                direction="horizontal"
+                style={{
+                    width: "400px",
+                }}
+                wrap
+            >
 
-                                }}
-                            >
-                                {genre!.name}
-                            </Button>
-                        )
-                    })
-                    :
-                    <></>
-                }
                 {genres === undefined ?
                     <Select
                         value="Выберете жанр"
@@ -153,6 +121,7 @@ export default function AddFilm() {
                     :
                     <Select
                         value="Выберете жанр"
+                        disabled={isDisableSubmitButton}
                         onChange={(value) => {
                             if (value !== "Выберете жанр") {
                                 setChoosedGenres([...choosedGenres, value]);
@@ -173,10 +142,36 @@ export default function AddFilm() {
                         })}
                     </Select>
                 }
+                {genres !== undefined ?
+                    choosedGenres.map(elem => {
+                        const genre = genres.find(genre_ => elem === genre_.id)
+                        return (
+                            <Button
+                                danger
+                                disabled={isDisableSubmitButton}
+                                onClick={() => {
+                                    setChoosedGenres(
+                                        choosedGenres.filter((filterElem) => {
+                                            if (filterElem !== elem) {
+                                                return elem;
+                                            };
+                                        })
+                                    )
+
+                                }}
+                            >
+                                {genre!.name}
+                            </Button>
+                        )
+                    })
+                    :
+                    <></>
+                }
             </Space>
             <Text>Возрастное ограничение:</Text>
             <Select
-                defaultValue={0}
+                value={ageLimitFilm}
+                disabled={isDisableSubmitButton}
                 onChange={(value) => {
                     setAgeLimitFilm(value)
                 }}
@@ -197,25 +192,40 @@ export default function AddFilm() {
                     +18
                 </Option>
             </Select>
-            {/* </Space>
-            <Space direction="horizontal"> */}
             <Text>Описание:</Text>
-            <Input
-                type="text"
+            <TextArea
+                autoSize
+                disabled={isDisableSubmitButton}
+                value={descriptionFilm}
                 onChange={(event) => {
                     setDescriptionFilm(event.target.value);
                 }}
-            ></Input>
-            {/* </Space> */}
-            <Button
-                type="primary"
-                htmlType="submit"
-                disabled={isDisableButton}
-                onClick={() => {
-                    setIsDisableButton(true);
-                    addFilm();
-                }}
-            >добавить</Button>
+            ></TextArea >
+            <Space direction="horizontal">
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={isDisableSubmitButton}
+                    onClick={() => {
+                        setIsDisableSubmitButton(true);
+                        addFilm();
+                    }}
+                >добавить</Button>
+                {isVisibleRefreshButton ?
+                    <Button onClick={() => {
+                        setNameFilm("");
+                        setChoosedGenres([]);
+                        setAgeLimitFilm(0);
+                        setDescriptionFilm("");
+                        setIsVisibleRefreshButton(false);
+                        setIsDisableSubmitButton(false);
+                    }}>
+                        Добавить ещё
+                    </Button>
+                    :
+                    <></>
+                }
+            </Space>
         </Space >
     );
 }

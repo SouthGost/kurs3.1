@@ -4,10 +4,11 @@ const { Option } = Select;
 const { Text, Title } = Typography;
 
 export default function AddEmployee() {
-    const [isDisableButton, setIsDisableButton] = useState(false);
+    const [isDisableSubmitButton, setIsDisableSubmitButton] = useState(false);
+    const [isVisibleRefreshButton, setIsVisibleRefreshButton] = useState(false);
     const [login, setLogin] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [position, setPosition] = useState<string>("");
+    const [position, setPosition] = useState<string>();
     const [name, setName] = useState<string>("");
     const [surname, setSurname] = useState<string>("");
     const [patronymic, setPatronymic] = useState<string>("");
@@ -16,11 +17,11 @@ export default function AddEmployee() {
         if (
             login === "" ||
             password === "" ||
-            position === "" ||
+            position ===  undefined ||
             name === "" ||
             surname === ""
         ) {
-            setIsDisableButton(false);
+            setIsDisableSubmitButton(false);
             notification.warning({
                 message: "Ошибка",
                 description: "Вы не полностью ввели данные",
@@ -45,18 +46,19 @@ export default function AddEmployee() {
             const response = await fetch(`http://localhost:8000/api/auth/register/employee`, params);
             if (response.ok) {
                 const data = await response.json();
+                setIsVisibleRefreshButton(true);
                 Modal.success({
                     title: "Работник добавлен",
                 });
             } else {
-                setIsDisableButton(false);
+                setIsDisableSubmitButton(false);
                 Modal.warning({
                     title: "Отказано",
-                    content: "Вы не правильно ввели данные",
+                    content: "Ошибка в данных. Возможно такой логин занят",
                 });
             }
         } catch (err) {
-            setIsDisableButton(false);
+            setIsDisableSubmitButton(false);
             Modal.error({
                 title: 'Ошибка',
                 content: 'У нас проблемы. Подождите немного.',
@@ -71,22 +73,28 @@ export default function AddEmployee() {
             <Title>Добавить работника</Title>
             <Text>Логин:</Text>
             <Input
+                value={login}
+                disabled={isDisableSubmitButton}
                 onChange={(event) => {
                     setLogin(event.target.value);
                 }}
             ></Input>
             <Text>Пароль:</Text>
             <Input
-            type="password"
+                type="password"
+                value={password}
+                disabled={isDisableSubmitButton}
                 onChange={(event) => {
                     setPassword(event.target.value);
                 }}
             ></Input>
             <Text>Должность:</Text>
             <Select
-                defaultValue={"Выберете должность"}
+                value={position}
+                placeholder={"Выберете должность"}
+                disabled={isDisableSubmitButton}
                 onChange={(value) => {
-                    if (value !== "Выберете должность") {
+                    if (value !== undefined) {
                         setPosition(value)
                     }
                 }}
@@ -100,31 +108,55 @@ export default function AddEmployee() {
             </Select>
             <Text>Имя:</Text>
             <Input
+                value={name}
+                disabled={isDisableSubmitButton}
                 onChange={(event) => {
                     setName(event.target.value);
                 }}
             ></Input>
             <Text>Фамилия:</Text>
             <Input
+                value={surname}
+                disabled={isDisableSubmitButton}
                 onChange={(event) => {
                     setSurname(event.target.value);
                 }}
             ></Input>
             <Text>Отчество:</Text>
             <Input
+                value={patronymic}
+                disabled={isDisableSubmitButton}
                 onChange={(event) => {
                     setPatronymic(event.target.value);
                 }}
             ></Input>
+             <Space direction="horizontal">
             <Button
                 type="primary"
                 htmlType="submit"
-                disabled={isDisableButton}
+                disabled={isDisableSubmitButton}
                 onClick={() => {
-                    setIsDisableButton(true);
+                    setIsDisableSubmitButton(true);
                     addEmployee();
                 }}
             >добавить</Button>
+            {isVisibleRefreshButton ?
+            <Button onClick={() => {
+                setLogin("");
+                setPassword("");
+                setPosition(undefined);
+                setName("");
+                setSurname("");
+                setPatronymic("");
+                setIsVisibleRefreshButton(false);
+                setIsDisableSubmitButton(false);
+            }}>
+                Добавить ещё
+            </Button>
+            :
+            <></>
+        }
+            </Space>
         </Space>
     )
 }

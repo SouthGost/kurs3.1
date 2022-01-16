@@ -2,28 +2,23 @@ import React, { useEffect, useState } from "react";
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import { Input, Button, notification, Modal, Typography, Space, Select, DatePicker, Checkbox } from "antd";
+import FetchRequest from "../../../../classes/FetchRequest";
+import ResFilm from "../../../../interfaces/IResFilm";
+import ResHall from "../../../../interfaces/IResHall";
 const { Text, Title } = Typography;
 const { Option } = Select;
-
-type films = {
-    id: number,
-    name: string
-}[];
-type halls = {
-    id: number,
-    name: string
-}[];
 type time = "10:00" | "13:30" | "17:00" | "20:45" | "23:10";
 type busyDate = {
     date: string,
     times: time[],
-}[]
+}
 
 export default function AddSession() {
-    const [isDisableButton, setIsDisableButton] = useState(false);
-    const [films, setFilms] = useState<films>();
-    const [halls, setHalls] = useState<halls>();
-    const [busyDates, setBusyDates] = useState<busyDate>();
+    const [isDisableSubmitButton, setIsDisableSubmitButton] = useState(false);
+    const [isVisibleRefreshButton, setIsVisibleRefreshButton] = useState(false);
+    const [films, setFilms] = useState<ResFilm[]>();
+    const [halls, setHalls] = useState<ResHall[]>();
+    const [busyDates, setBusyDates] = useState<busyDate[]>();
     const [busyTimes, setBusyTimes] = useState<time[]>();
     const [choosedFilm, setChoosedFilm] = useState<number>();
     const [choosedHall, setChoosedHall] = useState<number>();
@@ -38,26 +33,9 @@ export default function AddSession() {
 
     useEffect(() => {
         async function getInfoForSession() {
-            const params = {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            };
-
             try {
-                const response = await fetch(`http://localhost:8000/api/info/forSession`, params);
-                if (response.ok) {
-                    const data = await response.json();
-                    setFilms(data.films);
-                    setHalls(data.halls);
-
-                } else {
-                    Modal.error({
-                        title: 'Ошибка',
-                        content: 'У нас проблемы. Подождите немного.',
-                    });
-                }
+                setFilms(await FetchRequest.getFilms());
+                setHalls(await FetchRequest.getHalls());
             } catch (err) {
                 Modal.error({
                     title: 'Ошибка',
@@ -68,7 +46,7 @@ export default function AddSession() {
 
         getInfoForSession();
     }, []);
-    
+
     async function checkDates() {
         const params = {
             method: "POST",
@@ -85,7 +63,6 @@ export default function AddSession() {
             if (response.ok) {
                 const data = await response.json();
                 await setBusyDates(data.dates);
-                // setBusyTimes(busyDate.times);
             } else {
                 Modal.error({
                     title: 'Ошибка',
@@ -116,6 +93,7 @@ export default function AddSession() {
             choosedTime === undefined ||
             choosedD === undefined
         ) {
+            setIsDisableSubmitButton(false);
             notification.warning({
                 message: "Ошибка",
                 description: "Вы не полностью ввели данные",
@@ -144,20 +122,21 @@ export default function AddSession() {
             const response = await fetch(`http://localhost:8000/api/add/session`, params);
             if (response.ok) {
                 const data = await response.json();
-                // checkDates();
+                setIsVisibleRefreshButton(true);
+                setBusyDates(undefined);
+                setBusyTimes(undefined);
                 Modal.success({
                     title: "Сеанс добавлен",
                 });
             } else {
-                // checkDates();
-                setIsDisableButton(false);
+                setIsDisableSubmitButton(false);
                 Modal.warning({
                     title: "Отказано",
                     content: "Вы не правильно ввели данные",
                 });
             }
         } catch (err) {
-            setIsDisableButton(false);
+            setIsDisableSubmitButton(false);
             Modal.error({
                 title: 'Ошибка',
                 content: 'У нас проблемы. Подождите немного.',
@@ -168,13 +147,14 @@ export default function AddSession() {
     return (
         <Space direction="vertical">
             <Title>Добавить сеанс</Title>
-            {/* <Space direction="horizontal"> */}
             <Text>Фильм:</Text>
             {films === undefined ?
                 <Select defaultValue="Выберете фильм" disabled></Select>
                 :
                 <Select
-                    defaultValue="Выберете фильм"
+                    disabled={isDisableSubmitButton}
+                    value={choosedFilm}
+                    placeholder="Выберете фильм"
                     onChange={(value) => {
                         if (typeof value == "number") {
                             setChoosedFilm(value);
@@ -193,9 +173,13 @@ export default function AddSession() {
                 <Select defaultValue="Выберете зал" disabled></Select>
                 :
                 <Select
-                    defaultValue="Выберете зал"
+                    value={choosedHall}
+                    placeholder="Выберете зал"
+                    disabled={isDisableSubmitButton}
                     onChange={(value) => {
-                        if (typeof value == "number") {
+                        if (value !== undefined) {
+                            setBusyTimes(undefined);
+                            setChoosedDate(null);
                             setChoosedHall(value);
                         }
                     }}
@@ -210,13 +194,19 @@ export default function AddSession() {
             <Text>Дата:</Text>
             <Space direction="horizontal">
                 <DatePicker
-                    disabled={busyDates === undefined}
+                    allowClear={false}
+                    disabled={busyDates === undefined || isDisableSubmitButton}
+                    value={choosedDate === null ?
+                        null
+                        :
+                        moment(choosedDate, "YYYY-MM-DD")
+                    }
                     placeholder="Выберите дату"
                     disabledDate={(current) => {
-                        // if(current <= moment()){
-                        //     return true
-                        // }
-                        // if (busyDates !== undefined) {
+                        if (current <= moment().add(-1, "days")) {
+                            return true
+                        }
+                        if (busyDates !== undefined) {
                             const busyDate = busyDates!.find((elem) => {
                                 return elem.date === current.format("YYYY-MM-DD")
                             })
@@ -225,15 +215,14 @@ export default function AddSession() {
                                     return true
                                 }
                             }
-                        // }
+                        }
                         return false
                     }}
                     onChange={(date, dateString) => {
-                        console.log(date, dateString);
                         const busyDate = busyDates!.find(elem => {
                             return elem.date === dateString
                         })
-                        if(busyDate !== undefined){
+                        if (busyDate !== undefined) {
                             setBusyTimes(busyDate.times);
                         } else {
                             setBusyTimes([]);
@@ -242,10 +231,11 @@ export default function AddSession() {
                     }}
                 />
                 <Select
-                    disabled={busyTimes === undefined}
-                    defaultValue="Выберете время"
+                    disabled={busyTimes === undefined || isDisableSubmitButton}
+                    value={choosedTime}
+                    placeholder="Выберете время"
                     onChange={(value) => {
-                        if (value !== "Выберете время") {
+                        if (value !== undefined) {
                             setChoosedTime(value)
                         }
                     }}
@@ -254,16 +244,16 @@ export default function AddSession() {
                         let busy = false;
 
                         let busyTime = undefined;
-                        if(busyTimes !== undefined){
+                        if (busyTimes !== undefined) {
                             busyTime = busyTimes.find(bt => {
                                 return bt === time
                             })
                         }
-                        if(busyTime !== undefined){
+                        if (busyTime !== undefined) {
                             busy = true;
                         }
 
-                        return(
+                        return (
                             <Option disabled={busy} value={time} key={time}>
                                 {time}
                             </Option>
@@ -274,7 +264,8 @@ export default function AddSession() {
             <Text>Тип показа:</Text>
             <Space direction="horizontal">
                 <Select
-                    defaultValue={2}
+                    disabled={isDisableSubmitButton}
+                    value={choosedD}
                     onChange={(value) => {
                         setChoosedD(value)
                     }}
@@ -287,6 +278,7 @@ export default function AddSession() {
                     </Option>
                 </Select>
                 <Checkbox
+                    disabled={isDisableSubmitButton}
                     checked={isIMAX}
                     onChange={() => {
                         setIsIMAX(!isIMAX)
@@ -295,6 +287,7 @@ export default function AddSession() {
                     IMAX
                 </Checkbox>
                 <Checkbox
+                    disabled={isDisableSubmitButton}
                     checked={isDolbyAudio}
                     onChange={() => {
                         setIsDolbyAudio(!isDolbyAudio)
@@ -305,8 +298,10 @@ export default function AddSession() {
             </Space>
             <Text>Стоимость:</Text>
             <Input
+                disabled={isDisableSubmitButton}
                 type="number"
                 placeholder="Введите цену"
+                value={cost}
                 min={0}
                 onChange={(event) => {
                     const val = +event.target.value;
@@ -317,16 +312,35 @@ export default function AddSession() {
                     }
                 }}
             />
-
-            <Button
-                type="primary"
-                htmlType="submit"
-                disabled={isDisableButton}
-                onClick={() => {
-                    setIsDisableButton(true);
-                    addSession();
-                }}
-            >добавить</Button>
+            <Space direction="horizontal">
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                    disabled={isDisableSubmitButton}
+                    onClick={() => {
+                        setIsDisableSubmitButton(true);
+                        addSession();
+                    }}
+                >добавить</Button>
+                {isVisibleRefreshButton ?
+                    <Button onClick={() => {
+                        setChoosedFilm(undefined);
+                        setChoosedHall(undefined);
+                        setChoosedDate(null);
+                        setChoosedTime(undefined);
+                        setChoosedD(2);
+                        setIsIMAX(false);
+                        setIsDolbyAudio(false);
+                        setCost(undefined);
+                        setIsVisibleRefreshButton(false);
+                        setIsDisableSubmitButton(false);
+                    }}>
+                        Добавить ещё
+                    </Button>
+                    :
+                    <></>
+                }
+            </Space>
         </Space>
     );
 }

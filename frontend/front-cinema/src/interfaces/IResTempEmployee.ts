@@ -1,4 +1,7 @@
-interface IResEmployee {
+interface ResTempEmployee {
+    id: number,
+    date: string,
+    action: string,
     login: string,
     password: string,
     position: string,
@@ -8,4 +11,4 @@ interface IResEmployee {
     used: boolean,
 };
 
-export default IResEmployee;
+export default ResTempEmployee;

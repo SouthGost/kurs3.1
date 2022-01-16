@@ -5,8 +5,9 @@ import ResHaall from "../interfaces/IResHall";
 import ResPlaceCategory from "../interfaces/IResPlaceCategory";
 import PlaceCategory from './PlaceCategory';
 import moment from 'moment';
-import { Button, Space, Typography } from "antd";
+import { Button, Space, Typography, Modal } from "antd";
 import User from "./User";
+import FetchRequest from "./FetchRequest";
 const { Text } = Typography;
 
 export default class Hall {
@@ -24,8 +25,7 @@ export default class Hall {
         res_places: ResPlace[],
         place_categorys: ResPlaceCategory[],
         showModal: (title: string, elem: JSX.Element) => void,
-        user:  User
-        // changeChoosedPlace: (action: string, place: Place) => void
+        user: User
     ) {
         this.id = hall.id;
         this.name = hall.name;
@@ -57,60 +57,18 @@ export default class Hall {
         sessionCost: number,
         session_id: number,
         showModal: (title: string, elem: JSX.Element) => void,
-        user:  User
-        // changeChoosedPlace: (action: string, place: Place) => void
+        user: User
     ) {
-        const params = {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                hall_id,
-            }),
-        };
-
         try {
-            const response = await fetch(`http://localhost:8000/api/info/hall`, params);
-            if (response.ok) {
-                const data = await response.json();
-                return new Hall(data.hall, sessionCost, session_id, data.places, data.place_categorys, showModal, user);
-            } else {
-                throw new Error("Не найден зал");
-            }
+            const data = await FetchRequest.getHallInfo(hall_id);
+            return new Hall(data.hall, sessionCost, session_id, data.places, data.place_categorys, showModal, user);
         } catch (err) {
             throw new Error("У нас проблемы. Подождите немного.");
         }
     }
 
-    async updatePlaces() {
-        const params = {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                session_id: this.session_id,
-            }),
-        };
-
-        try {
-            const response = await fetch(`http://localhost:8000/api/info/tickets`, params);
-            if (response.ok) {
-                const data = await response.json();
-                this.updatePlaces_(data.tickets);
-                // console.log(data);
-            } else {
-                throw new Error("Не найден сеанс");
-            }
-        } catch (err) {
-            throw new Error("У нас проблемы. Подождите немного.");
-        }
-    }
-
-    private async updatePlaces_(
-        boughtTicket: ResTicket[],
-    ) {
+    public async updatePlaces() {
+        const boughtTicket: ResTicket[] = await FetchRequest.getSessionPlaces(this.session_id);
         this.places.forEach((elem) => {
             elem.forEach(place => {
                 const id = place.getId();
@@ -139,7 +97,7 @@ export default class Hall {
         return cost;
     }
 
-    public setUser(user: User){
+    public setUser(user: User) {
         this.user = user;
     }
 
@@ -164,35 +122,21 @@ export default class Hall {
 
         }
 
-        const params = {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                session_id: this.session_id,
-                choosed_places: choosedPlaces,
+        try {
+            const data = await FetchRequest.buyTickets(
+                this.session_id,
+                choosedPlaces,
                 employee_login,
                 user_login
-            }),
-        };
-
-        try {
-            const response = await fetch(`http://localhost:8000/api/add/tickets`, params);
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data)
-                await this.updatePlaces();
-                this.showModal(this.name, this.getContent())
-                //-----------действие--------
-                // console.log(data);
-            } else {
-                throw new Error("Не найден сеанс");
-            }
-        } catch (err) {
-            throw new Error("У нас проблемы. Подождите немного.");
+            );
+        } catch (err: any) {
+            Modal.error({
+                title: 'Ошибка',
+                content: 'Возможно на одно из мест уже приобрели билеты',
+            });
         }
-
+        await this.updatePlaces();
+        this.showModal(this.name, this.getContent());
     }
 
     public getName() {
@@ -203,16 +147,28 @@ export default class Hall {
         const toPay = this.getCostOfCoosed();
         return (
             <Space direction="vertical">
-                {this.places.map((elem, index) => (
-                    <Space direction="horizontal">
-                        <Text>{index} ряд</Text>
-                        <Space direction="horizontal">
-                            {elem.map(place => (
-                                place.getContent()
-                            ))}
-                        </Space>
+                <Space direction="horizontal">
+                    <Space direction="vertical" size={18}>
+                        {this.places.map((elem, index) => (
+                            <Text>{index} ряд</Text>
+                        ))}
                     </Space>
-                ))}
+                    <Space direction="vertical">
+                        {this.places.map((elem) => (
+                            <Space
+                                style={{
+                                    width: "100%",
+                                    justifyContent: 'center'
+                                }}
+                                direction="horizontal"
+                            >
+                                {elem.map(place => (
+                                    place.getContent()
+                                ))}
+                            </Space>
+                        ))}
+                    </Space>
+                </Space>
                 <Space direction='horizontal'>
                     {toPay === 0 ?
                         <></>

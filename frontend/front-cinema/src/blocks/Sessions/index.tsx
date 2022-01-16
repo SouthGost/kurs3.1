@@ -20,7 +20,6 @@ export default function Sessions() {
     const [modal, setModal] = useState<modal>();
     const [choosedPlace, setChoosedPlace] = useState<Place[]>([])
     const user = useAppSelector(state => state.user.val);
-    // const [toPay, setToPay] = useState(0);
 
     const showModal = (title: string, elem: JSX.Element) => {
         document.body.style.overflow = 'hidden';
@@ -32,32 +31,6 @@ export default function Sessions() {
             table.setUser(user);
         }
     });
-
-    // const changeChoosedPlace = (action: string, place: Place) => {
-    //     if (action == "add") {
-    //         if (choosedPlace.indexOf(place) === -1) {
-    //             setChoosedPlace([...choosedPlace, place]);
-    //         }
-    //     } else if (action == "delete") {
-    //         if (choosedPlace.indexOf(place) !== -1) {
-    //             setChoosedPlace(
-    //                 choosedPlace.filter((elem) => {
-    //                     if (elem !== place) {
-    //                         return elem;
-    //                     };
-    //                 })
-    //             );
-    //         }
-    //     }
-    // }
-
-    // useEffect(()=>{
-    //     let cost = 0;
-    //     choosedPlace.forEach(place => {
-    //         cost += place.getCost();
-    //     })
-    //     setToPay(cost);
-    // }, [choosedPlace])
 
     useEffect(() => {
         async function waitTable() {
@@ -89,8 +62,10 @@ export default function Sessions() {
             <DatePicker
                 value={choosedDate}
                 allowClear={false}
+                disabledDate={(current) => {
+                    return current < moment().add(-1, 'days');
+                }}
                 onChange={(date, dateString) => {
-                    console.log(date, dateString);
                     setChoosedDate(date!);
                 }}
             />

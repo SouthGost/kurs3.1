@@ -10,18 +10,21 @@ import Admin from './blocks/Admin';
 import Login from './blocks/Auth/Login';
 import Register from './blocks/Auth/Register';
 import Sessions from './blocks/Sessions';
-import AddFilm from './blocks/Admin/AddFilm';
-import AddSession from './blocks/Admin/AddSession';
-import EditFilms from './blocks/Admin/EditFilms';
+import AddFilm from './blocks/Admin/Add/Film';
+import AddSession from './blocks/Admin/Add/Session';
+import AddEmployee from './blocks/Admin/Add/Employee';
 import { Space, Button, Modal } from 'antd';
+import EditFilms from './blocks/Admin/Edit/Films';
+import EditSessions from './blocks/Admin/Edit/Sessions';
+import EditEmpolyees from './blocks/Admin/Edit/Empolyees';
 import './App.css';
-import AddEmployee from './blocks/Admin/AddEmployee';
+import HistoryFilms from './blocks/Admin/History/Films';
+import HistorySessions from './blocks/Admin/History/Sessions';
+import HistoryEmployees from './blocks/Admin/History/Employees';
 
 export default function App() {
     const dispatch = useAppDispatch();
-    //const [user, setUser] = useState<User>(useAppSelector(state => state.user)); 
     const user = useAppSelector(state => state.user.val);
-    //console.log("user", user );//!== undefined ? user.getLogin() : "нет"
     const [token, setToken] = useState(Cookies.get("token"));
 
     useEffect(() => {
@@ -65,9 +68,6 @@ export default function App() {
 
     return (
         <div className="App">
-            {/* {user.getLogin() === "" ?
-                <Login />
-                : */}
             <>
                 <Space className="navigation" direction="horizontal">
                     <Link to="/">
@@ -105,17 +105,20 @@ export default function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="/admin" element={<Admin />} >
-                            <Route path="addfilm" element={<AddFilm />} />
-                            <Route path="addsession" element={<AddSession />} />
-                            <Route path="addemployee" element={<AddEmployee />} />
-                            <Route path="editfilms" element={<EditFilms />} />
-                            
+                            <Route path="add/film" element={<AddFilm />} />
+                            <Route path="add/session" element={<AddSession />} />
+                            <Route path="add/employee" element={<AddEmployee />} />
+                            <Route path="edit/films" element={<EditFilms />} />
+                            <Route path="edit/sessions" element={<EditSessions />} />
+                            <Route path="edit/employees" element={<EditEmpolyees />} />
+                            <Route path="history/films" element={<HistoryFilms />} />
+                            <Route path="history/sessions" element={<HistorySessions />} />
+                            <Route path="history/employees" element={<HistoryEmployees />} />
                         </Route>
                         <Route path="*" element={<WrongPage />} />
                     </Routes>
                 </Space>
             </>
-            {/* } */}
 
         </div>
     );

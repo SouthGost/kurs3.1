@@ -3,7 +3,6 @@ import User from '../classes/User';
 import Employee from '../classes/Employee';
 
 const initialState:{val:User} = {
-    // val: new Employee("admin","123","proger","admin"),
     val: new User({login: "", password: ""}),
 }
 
@@ -11,7 +10,7 @@ const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
-        setUser: (state, action:PayloadAction<User>) => {  // :PayloadAction<number>
+        setUser: (state, action:PayloadAction<User>) => { 
             state.val = action.payload;
         },
     },

@@ -8,16 +8,14 @@ export default class Place {
     private number: number;
     private state: string;
     private sessionCost: number;
-    private placeCategory: PlaceCategory;//-------
+    private placeCategory: PlaceCategory;
     private showModal: () => void;
-    // private changeChoosedPlace: (action: string, place: Place) => void
 
     public constructor(
         sessionCost: number,
         place: ResPlaces,
         placeCategory: PlaceCategory,
         showModal: () => void,
-        // changeChoosedPlace: (action: string, place: Place) => void
     ) {
         this.id = place.id;
         this.row = place.row;
@@ -26,23 +24,7 @@ export default class Place {
         this.sessionCost = sessionCost;
         this.placeCategory = placeCategory;
         this.showModal = showModal;
-        // this.changeChoosedPlace = changeChoosedPlace;
     }
-
-    // public static async createPlace(
-    //     sessionCost: number,
-    //     place: ResPlaces,
-    //     showModal: () => void,
-    //     changeChoosedPlace: (action: string, place: Place) => void
-    // ) {
-    //     return new Place(
-    //         sessionCost,
-    //         place,
-    //         await PlaceCategory.createCategory(place.place_category_id),
-    //         showModal,
-    //         changeChoosedPlace
-    //     );
-    // }
 
     public setState(state: string) {
         this.state = state;
@@ -85,11 +67,4 @@ export default class Place {
         )
     }
 
-    // public getRow(){
-    //     return this.row;
-    // }
-
-    // public getNumber(){
-    //     return this.number;
-    // }
 }

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { immerable } from "immer";
 import IResUser from '../interfaces/IResUser';
 import { Button, Typography } from 'antd';
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 export default class User {
     [immerable] = true;
@@ -27,9 +27,9 @@ export default class User {
         return (
             <>
                 {elements}
-                <Button>
+                <Title level={5}>
                     {this.login}
-                </Button>
+                </Title>
             </>
         );
     }

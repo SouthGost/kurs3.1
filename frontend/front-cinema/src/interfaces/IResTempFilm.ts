@@ -1,7 +1,10 @@
 import IGenre from './IGenre';
 
-interface ResFilm {
+interface ResTempFilm {
     id: number,
+    date: string,
+    action: string,
+    film_id: number,
     name: string,
     age_limit: string,
     genres: IGenre[],
@@ -9,4 +12,4 @@ interface ResFilm {
     used: boolean,
 };
 
-export default ResFilm;
+export default ResTempFilm;

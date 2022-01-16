@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import ResFilm from './../../../interfaces/IResFilm';
-import Film from './../../../classes/Film';
-import EditFilm from "./EditFilm";
-import { Modal, Space, Typography, Table, Select, Button } from "antd";
-import IGenre from "../../../interfaces/IGenre";
+import ResFilm from '../../../../interfaces/IResFilm';
+import Film from '../../../../classes/Film';
+import Cookies from "js-cookie";
+import IGenre from "../../../../interfaces/IGenre";
+import FetchRequest from "../../../../classes/FetchRequest";
+import { Modal, Space, Typography, Table, Select, Button, notification } from "antd";
 const { Text, Title, Paragraph } = Typography;
 const { Option } = Select;
 type changedFilms = {
@@ -13,32 +14,35 @@ type changedFilms = {
     genres: IGenre[],
     description: string,
     changed: boolean,
-    delete: boolean
+    used: boolean
 }
 
 export default function EditFilms() {
     const [resFilms, setResFilms] = useState<ResFilm[]>();
     const [films, setFilms] = useState<changedFilms[]>();
     const [genres, setGenres] = useState<IGenre[]>();
+    const token = Cookies.get("token");
+
+    async function loadEditFilms() {
+        try {
+            setResFilms(await FetchRequest.getFilms());
+        } catch (error) {
+            Modal.error({
+                title: 'Ошибка',
+                content: 'У нас проблемы. Подождите немного.',
+            });
+        }
+    }
 
     useEffect(() => {
-        async function loadEditFilms() {
-            try {
-                setResFilms(await Film.loadFilms());
-            } catch (error) {
-                Modal.error({
-                    title: "Ошибка"
-                })
-            }
-        }
-
         async function getGenres() {
             try {
-                setGenres(await Film.getGenres());
+                setGenres(await FetchRequest.getGenres());
             } catch (error) {
                 Modal.error({
-                    title: "Ошибка"
-                })
+                    title: 'Ошибка',
+                    content: 'У нас проблемы. Подождите немного.',
+                });
             }
         }
 
@@ -50,7 +54,7 @@ export default function EditFilms() {
         if (resFilms !== undefined) {
             const films_: changedFilms[] = [];
             resFilms.forEach(elem => {
-                films_.push({ ...elem, changed: false, delete: false })
+                films_.push({ ...elem, changed: false })
             })
             setFilms(films_);
         }
@@ -123,9 +127,7 @@ export default function EditFilms() {
             dataIndex: "name",
             key: "id",
             render: (name: string, film: changedFilms) =>
-                film.delete ?
-                    <Text delete>{name}</Text>
-                    :
+                film.used ?
                     <Paragraph
 
                         editable={{
@@ -137,6 +139,8 @@ export default function EditFilms() {
                     >
                         {name}
                     </Paragraph >
+                    :
+                    <Text delete>{name}</Text>
 
         },
         {
@@ -144,9 +148,7 @@ export default function EditFilms() {
             dataIndex: "age_limit",
             key: "id",
             render: (age_limit: string, film: changedFilms) =>
-                film.delete ?
-                    <Text delete>+{age_limit}</Text>
-                    :
+                film.used ?
                     <Select
                         value={age_limit}
                         onChange={(value) => {
@@ -169,29 +171,16 @@ export default function EditFilms() {
                             +18
                         </Option>
                     </Select>
+                    :
+                    <Text delete>+{age_limit}</Text>
         },
         {
             title: "Жанры",
             dataIndex: "genres",
             key: "id",
             render: (choosedGenres: IGenre[], film: changedFilms) =>
-                film.delete ?
-                    <Text delete>Выберете жанр</Text>
-                    :
+                film.used ?
                     <Space direction="vertical">
-                        {choosedGenres !== undefined && choosedGenres.length !== 0 ?
-                            choosedGenres.map(elem => (
-                                <Button
-                                    onClick={() => {
-                                        changeChoosedGenres(film.id, "delete", elem.id);
-                                    }}
-                                >
-                                    {elem.name}
-                                </Button>
-                            ))
-                            :
-                            <></>
-                        }
                         {genres === undefined ?
                             <Select
                                 value="Выберете жанр"
@@ -203,7 +192,6 @@ export default function EditFilms() {
                                 onChange={(value) => {
                                     if (value !== "Выберете жанр") {
                                         changeChoosedGenres(film.id, "add", value)
-                                        // setChoosedGenres([...choosedGenres, value]);
                                     }
                                 }}
                             >
@@ -221,16 +209,31 @@ export default function EditFilms() {
                                 })}
                             </Select>
                         }
+                        {choosedGenres !== undefined && choosedGenres.length !== 0 ?
+                            choosedGenres.map(elem => (
+                                <Button
+                                    danger
+                                    onClick={() => {
+                                        changeChoosedGenres(film.id, "delete", elem.id);
+                                    }}
+                                >
+                                    {elem.name}
+                                </Button>
+                            ))
+                            :
+                            <></>
+                        }
+
                     </Space>
+                    :
+                    <Text delete>Выберете жанр</Text>
         },
         {
             title: "Описание",
             dataIndex: "description",
             key: "id",
             render: (description: string, film: changedFilms) =>
-                film.delete ?
-                    <Text delete>{description}</Text>
-                    :
+                film.used ?
                     <Paragraph
                         editable={{
                             onChange: (value) => {
@@ -241,39 +244,125 @@ export default function EditFilms() {
                     >
                         {description}
                     </Paragraph >
+                    :
+                    <Text delete>{description}</Text>
         },
         {
-            title: "Удалить",
-            dataIndex: "delete",
+            title: "",
+            dataIndex: "used",
             key: "id",
-            render: (isDelete: boolean, film: changedFilms) =>
+            render: (used: boolean, film: changedFilms) =>
                 <Button
+                    type={!used ? "primary" : "default"}
                     onClick={() => {
                         setFilms(films!.filter(elem => {
                             if (elem.id == film.id) {
-                                elem.delete = !elem.delete;
+                                elem.used = !elem.used;
                                 elem.changed = true;
                             }
                             return elem;
                         }))
                     }}
                 >
-                    {isDelete ? "Восстанавить" : "Удалить"}
+                    {used ? "Удалить" : "Не удалять"}
+                </Button>
+
+        },
+        {
+            title: "",
+            dataIndex: "changed",
+            key: "id",
+            render: (isChanged: boolean, film: changedFilms) =>
+                <Button
+                    disabled={!isChanged}
+                    onClick={() => {
+                        setFilms(films!.filter(elem => {
+                            if (elem.id == film.id) {
+                                const oldFilm = resFilms!.find(resFilm => resFilm.id === film.id);
+                                if (oldFilm !== undefined) {
+                                    elem.name = oldFilm.name;
+                                    elem.genres = oldFilm.genres;
+                                    elem.age_limit = oldFilm.age_limit;
+                                    elem.description = oldFilm.description;
+                                    elem.used = true;
+                                    elem.changed = false;
+                                } else {
+                                    Modal.error({
+                                        title: "Ошибка"
+                                    })
+                                }
+                            }
+                            return elem;
+                        }))
+                    }}
+                >
+                    Вернуть
                 </Button>
 
         }
     ]
 
+    async function sendChangedFilms() {
+        const changedFilms = films!.filter(elem => elem.changed)
+
+        if (changedFilms.length === 0) {
+            notification.warning({
+                message: "Ошибка",
+                description: "Вы ничего не поменяли",
+            });
+
+            return;
+        }
+
+        const params = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            }, body: JSON.stringify({
+                changedFilms,
+                token
+            }),
+        };
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/change/films`, params);
+            if (response.ok) {
+                const data = await response.json();
+                Modal.success({
+                    title: "Данные успешно изменены",
+                });
+                setResFilms(undefined);
+                await loadEditFilms();
+            } else {
+                Modal.error({
+                    title: 'Ошибка',
+                    content: 'У нас проблемы. Подождите немного.',
+                });
+            }
+        } catch (err) {
+            Modal.error({
+                title: 'Ошибка',
+                content: 'У нас проблемы. Подождите немного.',
+            });
+        }
+    }
+
     return (
         <Space direction="vertical">
             <Title>Редактирование фильмов</Title>
-            {films === undefined ?
+            {genres === undefined ||
+                films === undefined ?
                 <Text>Загрузка</Text>
                 :
-                <Table columns={columns} dataSource={films} />
-                // films.map(elem => (
-                // <EditFilm {...elem}/>
-                // ))
+                <>
+                    <Table pagination={false} columns={columns} dataSource={films} />
+                    <Button
+                        type="primary"
+                        onClick={sendChangedFilms}
+                    >
+                        Отправить
+                    </Button>
+                </>
             }
         </Space>
     )

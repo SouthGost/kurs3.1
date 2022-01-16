@@ -3,16 +3,19 @@ import ResPlace from "../interfaces/IResPlace";
 import ResTicket from "../interfaces/IResTicket";
 import ResSession from "../interfaces/IResSession";
 import moment from 'moment';
-import { Button, Space, Modal } from "antd";
+import { Button, Space, Modal, Typography, Badge } from "antd";
 import Hall from "./Hall";
 import User from "./User";
+import FetchRequest from "./FetchRequest";
+import ResViewType from "../interfaces/IResViewType";
+const { Text, Title } = Typography;
 
 export default class Session {
     private id: number;
-    private film_id: number;
+    private film_name: string;
     private hall_id: number;
     private cost: number;
-    private view_type_id: number;
+    private view_type: ResViewType;
     private date: moment.Moment;
     private hall: Hall | undefined;
     private showModal: (title: string, elem: JSX.Element) => void;
@@ -21,84 +24,64 @@ export default class Session {
 
     public constructor(
         session: ResSession,
+        film_name: string,
+        view_type: ResViewType,
         showModal: (title: string, elem: JSX.Element) => void,
-        // user: User
-        // changeChoosedPlace: (action: string, place: Place) => void
     ) {
         this.id = session.id;
-        this.film_id = session.film_id;
+        this.film_name = film_name;
         this.hall_id = session.hall_id;
         this.cost = session.cost;
-        this.view_type_id = session.view_type_id;
+        this.view_type = view_type;
         this.date = moment(session.date, "x");
         this.showModal = showModal;
-        // this.user = user;
     }
 
-    public static async loadSessions(date: moment.Moment, film_id: number) {
-        const params = {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                film_id,
-                date: date.format('x'),
-            }),
-        };
-
-        try {
-            const response = await fetch(`http://localhost:8000/api/info/sessions`, params);
-            if (response.ok) {
-                const data = await response.json();
-                return data.sessions;
-            } else {
-                throw new Error("Не найдены сеансы");
-            }
-        } catch (err) {
-            throw new Error("У нас проблемы. Подождите немного.");
-        }
-    }
-
-    public setUser(user: User){
+    public setUser(user: User) {
         this.user = user;
-        if(this.hall !== undefined){
+        if (this.hall !== undefined) {
             this.hall.setUser(user);
         }
     }
 
+    public getDate() {
+        return this.date;
+    }
+
     public getContent() {
-        const isDisableButton = moment() > this.date;
-        
+
         return (
             <>
-                <Button
-                    style={{
-                        height: "100%"
-                    }}
-                    disabled={isDisableButton}
-                    onClick={async () => {
-                        try{
-                            if (this.hall == undefined) {
-                                this.hall = await Hall.createHall(this.hall_id, this.cost, this.id, this.showModal, this.user!);
+                <Badge count={<Title level={5}>{this.view_type.d}D </Title>}>
+                    <Button
+                        style={{
+                            height: "100%",
+                        }}
+                        onClick={async () => {
+                            try {
+                                const showModal_ = (title: string, elem: JSX.Element) => this.showModal(`${this.film_name} ${this.view_type.d}D ${this.view_type.palette !== "default" ? this.view_type.palette : ""} ${this.view_type.audio !== "default" ? this.view_type.audio : ""} ${title}`, elem)
+                                if (this.hall == undefined) {
+                                    this.hall = await Hall.createHall(this.hall_id, this.cost, this.id, showModal_, this.user!);
+                                }
+                                await this.hall.updatePlaces();
+                                showModal_(this.hall.getName(), this.hall.getContent());
+                            } catch (e) {
+                                Modal.error({ title: "Ошибка", content: "У нас проблемы. Подождите немного." })
                             }
-                            await this.hall.updatePlaces();
-                            this.showModal(this.hall.getName(), this.hall.getContent());
-                        }catch(e){
-                            Modal.error({title:"Ошибка", content: "У нас проблемы. Подождите немного."})
-                        }
-                    }}
-                >
-                    <Space direction="vertical">
-                        <div>
-                            {this.date.format("HH:mm")}
-                        </div>
-                        <div>
-                            {this.cost}
-                        </div>
-                    </Space>
-                </Button>
-            </> 
+                        }}
+                    >
+                        <Space direction="vertical">
+                            <div>
+                                {this.date.format("HH:mm")}
+                            </div>
+
+                            <div>
+                                {this.cost}
+                            </div>
+                        </Space>
+                    </Button>
+                </Badge>
+            </>
         )
     }
 

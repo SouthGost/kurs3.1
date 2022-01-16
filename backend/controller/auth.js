@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 async function getEmployee(login) {
     const employee = await db.query(
-        'SELECT * FROM employee where login = $1',
+        'SELECT * FROM employee where login = $1 AND used = true',
         [login]
     );
     return employee.rows[0];
@@ -19,81 +19,60 @@ async function getUser(login) {
 }
 
 class AuthController {
-    // checkEmployee(login){
-    //     const employee;
-    //     async () => {
-    //         employee = await db.query(
-    //             'SELECT * FROM employee where login = $1',
-    //             [login]
-    //         );
-    //     }
-    //     if(employee.rows[0] === undefined){
-    //         console.log('Пусто');
-    //     } else {
-    //         console.log('Есть');
-    //     }
-    //     return employee.rows[0];
-    // }
-
-    // async getEmployees(req, res) {
-    //     const employees = await db.query('SELECT * FROM employee');
-    //     res.json(employees.rows);
-    // };
 
     async login(req, res) {
-        const { login, password } = req.body;
-        const employee = await getEmployee(login);
-        if (employee == undefined) {
-            const user = await getUser(login);
-            if (user !== undefined) {
-                console.log('Есть');
-                console.log(password, user.password)
-                if (await bcrypt.compare(password, user.password)) {
+        try {
+            const { login, password } = req.body;
+            const employee = await getEmployee(login);
+            if (employee == undefined) {
+                const user = await getUser(login);
+                if (user !== undefined) {
+                    if (await bcrypt.compare(password, user.password)) {
+                        return res.json({
+                            user: user,
+                            token: jwt.sign(user, "key")
+                        });
+                    }
+                }
+            } else {
+                if (await bcrypt.compare(password, employee.password)) {
                     return res.json({
-                        user: user,
-                        token: jwt.sign(user, "key")
+                        user: employee,
+                        token: jwt.sign(employee, "key")
                     });
                 }
             }
-        } else {
-            console.log('Есть');
-            console.log(password, employee.password)
-
-            if (await bcrypt.compare(password, employee.password)) {
-                return res.json({
-                    user: employee,
-                    token: jwt.sign(employee, "key")
-                });
-            }
+        } catch (e) {
+            console.log(e.message);
         }
         return res.sendStatus(400);
     };
 
     refresh(req, res) {
-        const { token } = req.body;
-        if (token === undefined) {
-            return res.sendStatus(400);
-        }
         try {
+            const { token } = req.body;
+            if (token === undefined) {
+                throw new Error("Нет токена");
+            }
             const user = jwt.verify(token, 'key');
             return res.json({ user });
         } catch (e) {
             console.log(e.message);
-            return res.sendStatus(400);
         }
+        return res.sendStatus(400);
     }
 
     async register(req, res) {
-        const { login, password } = req.body;
-        if (
-            login !== undefined &&
-            password !== undefined &&
-            login !== "" &&
-            password !== ""
-        ) {
-            const employee = await getEmployee(login);
-            if (employee == undefined) {
-                try {
+        try {
+            const { login, password } = req.body;
+            if (
+                login !== undefined &&
+                password !== undefined &&
+                login !== "" &&
+                password !== ""
+            ) {
+                const employee = await getEmployee(login);
+                if (employee == undefined) {
                     const newUser = (await db.query(
                         'INSERT INTO public.user (login, password) values ($1, $2) RETURNING *',
                         [login, await bcrypt.hash(password, 10)]
@@ -102,81 +81,45 @@ class AuthController {
                         user: newUser,
                         token: jwt.sign(newUser, "key")
                     });
-                } catch (e) {
-
                 }
             }
+        } catch (e) {
+            console.log(e.message);
         }
-        res.sendStatus(400);
+        return res.sendStatus(400);
     }
 
     async regEmployee(req, res) {
-        const { login, password, position, name, surname, patronymic } = req.body;
-        if (
-            login !== undefined &&
-            password !== undefined &&
-            position !== undefined &&
-            name !== undefined &&
-            surname !== undefined &&
-            login !== "" &&
-            password !== "" &&
-            position !== "" &&
-            name !== "" &&
-            surname !== ""
-        ) {
-            const user = await getUser(login);
-            if (user === undefined) {
-                try {
-                    let newEmployee;
-                    if(patronymic === undefined || patronymic === ""){
-                        newEmployee = (await db.query(
-                            'INSERT INTO employee (login, password, position, name, surname) values ($1, $2, $3, $4, $5) RETURNING *',
-                            [login, await bcrypt.hash(password, 10), position, name, surname]
-                        )).rows[0];
-                    } else {
-                        newEmployee = (await db.query(
-                            'INSERT INTO employee (login, password, position, name, surname, patronymic) values ($1, $2, $3, $4, $5, $6) RETURNING *',
-                            [login, await bcrypt.hash(password, 10), position, name, surname, patronymic]
-                        )).rows[0];
-                    }
+        try {
+            const { login, password, position, name, surname, patronymic } = req.body;
+            if (
+                login !== undefined &&
+                password !== undefined &&
+                position !== undefined &&
+                name !== undefined &&
+                surname !== undefined &&
+                patronymic !== undefined &&
+                login !== "" &&
+                password !== "" &&
+                position !== "" &&
+                name !== "" &&
+                surname !== ""
+            ) {
+                const user = await getUser(login);
+                if (user === undefined) {
+                    const newEmployee = (await db.query(
+                        'INSERT INTO employee (login, password, position, name, surname, patronymic, used) values ($1, $2, $3, $4, $5, $6, true) RETURNING *',
+                        [login, await bcrypt.hash(password, 10), position, name, surname, patronymic]
+                    )).rows[0];
+
                     return res.json({ newEmployee });
-                } catch (e) {
-                    console.log(e)
                 }
             }
+        } catch (e) {
+            console.log(e.message);
         }
-        res.sendStatus(400);
+        return res.sendStatus(400);
     };
-
-    // async updateEmployee(req, res){
-    //     const {id, name, val} = req.body;
-    //     const film = await db.query(
-    //         'UPDATE test set name = $1, val = $2 where id = $3 RETURNING *',
-    //         [name, val, id]
-    //     );
-    //     res.json(film.rows[0]);
-    // };
-
-    // async deleteEmployee(req, res){
-    //     const {login} = req.body;
-    //     console.log(login);
-    //     const employee = await db.query(
-    //         'SELECT * FROM employee where login = $1',
-    //         [login]
-    //     );
-    //     if(employee.rows[0] === undefined){
-    //         console.log('Пусто');
-    //         return res.sendStatus(400);
-    //     } 
-    //     const deleteEmployee = await db.query(
-    //         'DELETE FROM employee where login = $1',
-    //         [login]
-    //     );
-    //     console.log(employee);
-    //     res.json({
-    //         message: "delete",
-    //     });
-    // };
 
 };
 

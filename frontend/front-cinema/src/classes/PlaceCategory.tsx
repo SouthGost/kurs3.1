@@ -11,30 +11,6 @@ export default class PlaceCategory {
         this.coefficient = placeCategory.coefficient;
     }
 
-    // public static async createCategory(id: number){
-    //     const params = {
-    //         method: "POST",
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify({
-    //             place_category_id: id,
-    //         }),
-    //     };
-
-    //     try {
-    //         const response = await fetch(`http://localhost:8000/api/info/place_category`, params);
-    //         if (response.ok) {
-    //             const data = await response.json();
-    //             return new PlaceCategory(data);
-    //         } else {
-    //             throw new Error("Не найдеа категория места");
-    //         }
-    //     } catch (err) {
-    //         throw new Error("У нас проблемы. Подождите немного.");
-    //     }
-    // }
-
     public getName(){
         return this.name;
     }

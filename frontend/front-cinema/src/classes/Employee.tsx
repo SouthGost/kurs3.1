@@ -11,7 +11,7 @@ export default class Employee extends User {
     private patronymic: string;
 
     public constructor(employee: IResEmployee) {
-        super(employee);//{login: employee.login, password:employee.password}
+        super(employee);
         this.name = employee.name;
         this.position = employee.position;
         this.surname = employee.surname;

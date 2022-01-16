@@ -5,6 +5,7 @@ const server = require('http').Server(app);
 const addRouter = require('./routes/add');
 const authRouter = require('./routes/auth');
 const infoRouter = require('./routes/info');
+const changeRouter = require('./routes/change');
 const cors = require('cors');
 const corsOpts = {
     origin: '*',
@@ -24,10 +25,6 @@ app.use(express.json());
 app.use('/api/add', addRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/info', infoRouter);
-
-// app.get('/', (req,res) => {
-//     res.status(200).send("d");
-// })
-
+app.use('/api/change', changeRouter);
 
 server.listen(8000);

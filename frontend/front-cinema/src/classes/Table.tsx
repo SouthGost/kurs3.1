@@ -5,6 +5,7 @@ import { Modal, Space, Typography } from "antd";
 import Place from './Place';
 import User from './User';
 import Session from './Session';
+import FetchRequest from './FetchRequest';
 const { Text } = Typography;
 
 export default class Table {
@@ -17,13 +18,12 @@ export default class Table {
         films: ResFilm[],
         showModal: (title: string, elem: JSX.Element) => void,
         user: User
-        // changeChoosedPlace: (action: string, place: Place) => void
     ) {
         this.date = date;
         this.films = [];
         this.user = user;
         films.forEach((film) => {
-            this.films.push(new Film(film, /*this.date,*/ showModal));
+            this.films.push(new Film(film, showModal));
         })
 
     }
@@ -32,9 +32,8 @@ export default class Table {
         date: moment.Moment,
         showModal: (title: string, elem: JSX.Element) => void,
         user: User
-        // changeChoosedPlace: (action: string, place: Place) => void
     ) {
-        const films = await Film.loadFilms()
+        const films = await FetchRequest.getFilms()
         return new Table(date, films, showModal, user);
     }
 
@@ -58,7 +57,7 @@ export default class Table {
         try{
             this.date = date;
             for (const film of this.films) {
-                await film.setSessions(await Session.loadSessions(date, film.getId()));
+                await film.setSessions(await FetchRequest.getSessions(date, film.getId()));
             }
     
             return (
