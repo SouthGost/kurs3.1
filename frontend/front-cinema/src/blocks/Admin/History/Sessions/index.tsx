@@ -1,5 +1,5 @@
 import TempResSession from "../../../../interfaces/IResTempSession";
-import { Modal, Space, Typography, Table, Select, Button, notification } from "antd";
+import { Modal, Space, Typography, Table, Button, notification } from "antd";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import FetchRequest from "../../../../classes/FetchRequest";
@@ -8,8 +8,8 @@ import ResViewType from "../../../../interfaces/IResViewType";
 import ResHall from "../../../../interfaces/IResHall";
 import moment from "moment";
 import ResSession from "../../../../interfaces/IResSession";
-const { Text, Title, Paragraph } = Typography;
-const { Option } = Select;
+import { useAppSelector } from "../../../../reducers/store";
+const { Text, Title } = Typography;
 type TempSession = {
     id: number,
     date: string,
@@ -30,6 +30,16 @@ export default function HistorySessions() {
     const [halls, setHalls] = useState<ResHall[]>();
     const [viewTypes, setViewTypes] = useState<ResViewType[]>();
     const token = Cookies.get("token");
+    const user = useAppSelector(state => state.user.val);
+
+    useEffect(() => {
+        const position = user.getPosition();
+        const login = user.getLogin();
+
+        if ((position !== "admin" && login !== "") || token === undefined) {
+            window.location.replace("http://localhost:3000/admin");
+        }
+    }, [user]);
 
     async function loadTempSessions() {
         try {

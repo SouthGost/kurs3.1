@@ -1,8 +1,7 @@
 import User from "./User";
 import { Link } from "react-router-dom";
 import IResEmployee from '../interfaces/IResEmployee';
-import { Form, Input, Button, Card, notification, Typography } from 'antd';
-const { Text } = Typography;
+import { Button } from 'antd';
 
 export default class Employee extends User {
     private name: string;
@@ -18,15 +17,11 @@ export default class Employee extends User {
         this.patronymic = employee.patronymic;
     }
 
-    getFio(): string {
-        return this.name;
-    }
-
-    getPosition() {
+    public getPosition() {
         return this.position;
     }
 
-    getNavigation(): JSX.Element {
+    public getNavigation(): JSX.Element {
         const elements = (
             <Link to="/admin">
                 <Button>

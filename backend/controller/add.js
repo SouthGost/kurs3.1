@@ -2,6 +2,12 @@ const fs = require('fs');
 const moment = require('moment');
 const db = require('../db');
 const jwt = require('jsonwebtoken');
+const { execSync } = require("child_process");
+const dotenv = require('dotenv');
+dotenv.config();
+
+const bd_user = process.env.DB_USER;
+const database = process.env.DATABASE;
 
 function isApply(token, positions) {
     const user = jwt.verify(token, 'key');
@@ -167,6 +173,26 @@ class AddController {
             }
         } catch (e) {
             console.log(e.message);
+        }
+        return res.sendStatus(400);
+    }
+
+    async addBackup(req, res) {
+        try {
+            const { token } = req.body;
+            if (isApply(token, ["admin"])) {
+                let path = ""
+                const fileNameSplit = __filename.split("\\");
+                for (let i = 0; i < fileNameSplit.length - 2; i++) {
+                    path += `${fileNameSplit[i]}\\`
+                }
+                path += `backups\\${moment().format("HH-mm-ss_DD-MM-YYYY")}`;
+                execSync(`pg_dump -U ${bd_user} -d ${database} -f ${path} -F t`);
+
+                return res.json({ message: "Ok" });
+            }
+        } catch (e) {
+            console.log(e);
         }
         return res.sendStatus(400);
     }

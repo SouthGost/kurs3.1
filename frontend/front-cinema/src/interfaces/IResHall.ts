@@ -1,6 +1,6 @@
-interface ResHall {
+interface IResHall {
     id: number;
     name: string,
 };
 
-export default ResHall;
+export default IResHall;

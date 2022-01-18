@@ -1,7 +1,7 @@
-interface ResTicket {
-    id: number;
+interface IResTicket {
+    id: number,
     place_id: number,
     session_id: number
 };
 
-export default ResTicket;
+export default IResTicket;

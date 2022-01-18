@@ -1,9 +1,7 @@
-import React from 'react';
-import { Link } from "react-router-dom";
 import { immerable } from "immer";
 import IResUser from '../interfaces/IResUser';
-import { Button, Typography } from 'antd';
-const { Text, Title } = Typography;
+import { Typography } from 'antd';
+const { Title } = Typography;
 
 export default class User {
     [immerable] = true;
@@ -19,7 +17,7 @@ export default class User {
         return "User";
     }
 
-    getLogin(): string {
+    public getLogin(): string {
         return this.login;
     }
 

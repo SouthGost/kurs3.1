@@ -1,12 +1,8 @@
-import Place from "./Place";
-import ResPlace from "../interfaces/IResPlace";
-import ResTicket from "../interfaces/IResTicket";
 import ResSession from "../interfaces/IResSession";
 import moment from 'moment';
 import { Button, Space, Modal, Typography, Badge } from "antd";
 import Hall from "./Hall";
 import User from "./User";
-import FetchRequest from "./FetchRequest";
 import ResViewType from "../interfaces/IResViewType";
 const { Text, Title } = Typography;
 

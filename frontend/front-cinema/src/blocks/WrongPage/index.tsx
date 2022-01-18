@@ -1,4 +1,4 @@
-import { Form, Input, Button, Card, notification, Space, Typography } from 'antd';
+import { Space, Typography } from 'antd';
 const { Title } = Typography;
 
 export default function WrongPage(){

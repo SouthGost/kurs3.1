@@ -1,9 +1,9 @@
 import ResPlaceCategory from "../interfaces/IResPlaceCategory";
 
 export default class PlaceCategory {
-    id: number;
-    name: string;
-    coefficient: number;
+    private id: number;
+    private name: string;
+    private coefficient: number;
 
     public constructor(placeCategory: ResPlaceCategory) {
         this.id = placeCategory.id;
@@ -34,5 +34,6 @@ export default class PlaceCategory {
             case "choosed":
                 return "#FFD700"    
         }
+        return "white"
     }
 }

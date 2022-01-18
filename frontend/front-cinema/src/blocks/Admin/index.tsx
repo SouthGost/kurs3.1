@@ -8,9 +8,9 @@ import Cookies from 'js-cookie';
 
 
 export default function Admin() {
-    const user = useAppSelector(state => state.user.val)! as Employee;
+    const user = useAppSelector(state => state.user.val);
     const token = Cookies.get("token");
-    
+
     useEffect(() => {
         const position = user.getPosition();
         const login = user.getLogin();
@@ -68,6 +68,11 @@ export default function Admin() {
                         <Link to="history/employees">
                             <Button className="admin_link">
                                 История работников
+                            </Button>
+                        </Link>
+                        <Link to="history/backups">
+                            <Button className="admin_link">
+                                История базы данных
                             </Button>
                         </Link>
                     </>

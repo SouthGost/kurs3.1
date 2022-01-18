@@ -1,12 +1,8 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Table from '../../classes/Table';
-import User from '../../classes/User';
-import Employee from '../../classes/Employee';
-import { Modal, DatePicker, Space, Typography, Button } from 'antd';
-import Film from '../../classes/Film';
+import { DatePicker, Space, Typography, Button } from 'antd';
 import moment from 'moment';
 import { useAppSelector } from './../../reducers/store';
-import Place from '../../classes/Place';
 const { Text, Title } = Typography;
 type modal = {
     title: string,
@@ -18,7 +14,6 @@ export default function Sessions() {
     const [table, setTable] = useState<Table | null>();
     const [content, setContent] = useState<JSX.Element>();
     const [modal, setModal] = useState<modal>();
-    const [choosedPlace, setChoosedPlace] = useState<Place[]>([])
     const user = useAppSelector(state => state.user.val);
 
     const showModal = (title: string, elem: JSX.Element) => {
@@ -62,9 +57,9 @@ export default function Sessions() {
             <DatePicker
                 value={choosedDate}
                 allowClear={false}
-                disabledDate={(current) => {
-                    return current < moment().add(-1, 'days');
-                }}
+                // disabledDate={(current) => {
+                //     return current < moment().add(-1, 'days');
+                // }}
                 onChange={(date, dateString) => {
                     setChoosedDate(date!);
                 }}

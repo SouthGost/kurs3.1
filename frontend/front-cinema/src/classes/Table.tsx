@@ -1,10 +1,8 @@
 import Film from './Film';
 import ResFilm from '../interfaces/IResFilm';
 import moment from 'moment';
-import { Modal, Space, Typography } from "antd";
-import Place from './Place';
+import { Space, Typography } from "antd";
 import User from './User';
-import Session from './Session';
 import FetchRequest from './FetchRequest';
 const { Text } = Typography;
 
@@ -37,51 +35,42 @@ export default class Table {
         return new Table(date, films, showModal, user);
     }
 
-    public setUser(user: User){
+    public setUser(user: User) {
         this.user = user;
         this.films.forEach((film) => {
             film.setUser(user);
         })
     }
 
-    public getUser(){
-        return this.user;
-    }
-
-    public getDate() {
-        return this.date;
-    }
-
     public async getContent(date: moment.Moment) {
         const previousDate = this.date;
-        try{
-            this.date = date;
+        let error = false;
+        this.date = date;
+        try {
             for (const film of this.films) {
                 await film.setSessions(await FetchRequest.getSessions(date, film.getId()));
             }
-    
-            return (
-                <Space 
-                    direction="vertical"
-                    size={30}
-                >
-                    <Text>Сеансы на {this.date.format("DD-MM-YY")}</Text>
-                    {this.films.map((film) =>
-                        film.getContent()
-                    )}
-                </Space>
-            )
-        } catch(error){
+        } catch (err) {
             this.date = previousDate;
-
-            return(
-                <Space 
-                    direction="vertical"
-                    size={30}
-                >
-                    <Text>Подождите немного. У нас проблемы.</Text>
-                </Space>
-            )
+            error = true
         }
+
+        return (
+            <Space
+                direction="vertical"
+                size={30}
+            >
+                {!error ?
+                    <>
+                        <Text>Сеансы на {this.date.format("DD.MM.YY")}</Text>
+                        {this.films.map((film) =>
+                            film.getContent()
+                        )}
+                    </>
+                    :
+                    <Text>Подождите немного. У нас проблемы.</Text>
+                }
+            </Space>
+        )
     }
 }

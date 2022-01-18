@@ -1,6 +1,6 @@
 import IGenre from './IGenre';
 
-interface ResFilm {
+interface IResFilm {
     id: number,
     name: string,
     age_limit: string,
@@ -9,4 +9,4 @@ interface ResFilm {
     used: boolean,
 };
 
-export default ResFilm;
+export default IResFilm;

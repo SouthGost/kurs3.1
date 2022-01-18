@@ -1,5 +1,7 @@
 import { Button, Input, Modal, notification, Select, Space, Typography } from "antd";
-import { useState } from "react";
+import Cookies from "js-cookie";
+import { useEffect, useState } from "react";
+import { useAppSelector } from "../../../../reducers/store";
 const { Option } = Select;
 const { Text, Title } = Typography;
 
@@ -12,6 +14,17 @@ export default function AddEmployee() {
     const [name, setName] = useState<string>("");
     const [surname, setSurname] = useState<string>("");
     const [patronymic, setPatronymic] = useState<string>("");
+    const token = Cookies.get("token");
+    const user = useAppSelector(state => state.user.val);
+
+    useEffect(() => {
+        const position = user.getPosition();
+        const login = user.getLogin();
+
+        if ((position !== "admin" && login !== "") || token === undefined) {
+            window.location.replace("http://localhost:3000/admin");
+        }
+    }, [user]);
 
     async function addEmployee() {
         if (

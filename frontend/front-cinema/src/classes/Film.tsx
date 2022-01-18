@@ -1,10 +1,8 @@
 import ResFilm from "../interfaces/IResFilm";
 import ResSession from '../interfaces/IResSession';
-import Genre from "../interfaces/IGenre";
+import IGenre from "../interfaces/IGenre";
 import Session from './Session';
 import { Space, Typography } from "antd";
-import moment from 'moment';
-import Place from "./Place";
 import User from "./User";
 import Paragraph from "antd/lib/typography/Paragraph";
 import Title from "antd/lib/typography/Title";
@@ -14,10 +12,10 @@ const { Text } = Typography;
 
 export default class Film {
     private sessions: Session[];
-    private id;
+    private id: number;
     private name: string;
     private age_limit: string;
-    private genres: Genre[];
+    private genres: IGenre[];
     private description: string;
     private showModal: (title: string, elem: JSX.Element) => void;
 

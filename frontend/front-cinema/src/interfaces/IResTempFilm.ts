@@ -1,6 +1,6 @@
 import IGenre from './IGenre';
 
-interface ResTempFilm {
+interface IResTempFilm {
     id: number,
     date: string,
     action: string,
@@ -12,4 +12,4 @@ interface ResTempFilm {
     used: boolean,
 };
 
-export default ResTempFilm;
+export default IResTempFilm;

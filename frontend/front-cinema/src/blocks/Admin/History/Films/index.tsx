@@ -4,9 +4,9 @@ import IGenre from "../../../../interfaces/IGenre";
 import FetchRequest from "../../../../classes/FetchRequest";
 import Cookies from "js-cookie";
 import ResFilm from "../../../../interfaces/IResFilm";
-import { Modal, Space, Typography, Table, Select, Button, notification } from "antd";
-const { Text, Title, Paragraph } = Typography;
-const { Option } = Select;
+import { Modal, Space, Typography, Table, Button, notification } from "antd";
+import { useAppSelector } from "../../../../reducers/store";
+const { Text, Title } = Typography;
 type TempFilm = {
     id: number,
     action: string,
@@ -24,6 +24,16 @@ type TempFilm = {
 export default function HistoryFilms() {
     const [tempFilms, setTempFilms] = useState<TempFilm[]>();
     const token = Cookies.get("token");
+    const user = useAppSelector(state => state.user.val);
+
+    useEffect(() => {
+        const position = user.getPosition();
+        const login = user.getLogin();
+
+        if ((position !== "admin" && login !== "") || token === undefined) {
+            window.location.replace("http://localhost:3000/admin");
+        }
+    }, [user]);
 
     async function loadTempFilms() {
         try {

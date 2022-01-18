@@ -1,4 +1,4 @@
-interface ResSession {
+interface IResSession {
     id: number,
     film_id: number,
     hall_id: number,
@@ -8,4 +8,4 @@ interface ResSession {
     used: boolean,
 };
 
-export default ResSession;
+export default IResSession;

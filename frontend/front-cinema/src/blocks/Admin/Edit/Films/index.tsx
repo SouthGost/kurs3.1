@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import ResFilm from '../../../../interfaces/IResFilm';
-import Film from '../../../../classes/Film';
 import Cookies from "js-cookie";
 import IGenre from "../../../../interfaces/IGenre";
 import FetchRequest from "../../../../classes/FetchRequest";
 import { Modal, Space, Typography, Table, Select, Button, notification } from "antd";
+import { useAppSelector } from "../../../../reducers/store";
 const { Text, Title, Paragraph } = Typography;
 const { Option } = Select;
 type changedFilms = {
@@ -22,6 +22,16 @@ export default function EditFilms() {
     const [films, setFilms] = useState<changedFilms[]>();
     const [genres, setGenres] = useState<IGenre[]>();
     const token = Cookies.get("token");
+    const user = useAppSelector(state => state.user.val);
+
+    useEffect(() => {
+        const position = user.getPosition();
+        const login = user.getLogin();
+
+        if ((position !== "admin" && login !== "") || token === undefined) {
+            window.location.replace("http://localhost:3000/admin");
+        }
+    }, [user]);
 
     async function loadEditFilms() {
         try {

@@ -1,4 +1,4 @@
-interface ResPlaces {
+interface IResPlaces {
     id: number;
     hall_id: number,
     row: number,
@@ -6,4 +6,4 @@ interface ResPlaces {
     place_category_id: number,
 };
 
-export default ResPlaces;
+export default IResPlaces;

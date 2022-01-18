@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import FetchRequest from "../../../../classes/FetchRequest";
 import ResEmployee from "../../../../interfaces/IResEmployee";
+import { useAppSelector } from "../../../../reducers/store";
 const { Text, Title, Paragraph } = Typography;
 const { Option } = Select;
 type property = "newPassword" | "position" | "name" | "surname" | "patronymic";
@@ -21,6 +22,16 @@ export default function EditEmpolyee() {
     const [resEmployees, setResEmployees] = useState<ResEmployee[]>();
     const [employees, setEmployees] = useState<changedEmployee[]>();
     const token = Cookies.get("token");
+    const user = useAppSelector(state => state.user.val);
+
+    useEffect(() => {
+        const position = user.getPosition();
+        const login = user.getLogin();
+
+        if ((position !== "admin" && login !== "") || token === undefined) {
+            window.location.replace("http://localhost:3000/admin");
+        }
+    }, [user]);
 
     async function loadEmployees() {
         try {

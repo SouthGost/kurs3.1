@@ -1,8 +1,8 @@
-interface ResViewType {
+interface IResViewType {
     id: number;
     d: number,
     palette: string,
     audio: string,
 };
 
-export default ResViewType;
+export default IResViewType;

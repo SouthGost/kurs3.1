@@ -1,4 +1,5 @@
 const db = require('../db');
+const fs = require('fs');
 const moment = require('moment');
 
 class InfoController {
@@ -80,15 +81,15 @@ class InfoController {
         res.sendStatus(400);
     };
 
-    async viewType(req, res){
-        try{
+    async viewType(req, res) {
+        try {
             const { id } = req.body;
             const view_type = (await db.query(
                 "SELECT * FROM view_type where id = $1",
                 [id]
             )).rows[0];
-            return res.json({view_type})
-        }catch(err){
+            return res.json({ view_type })
+        } catch (err) {
             console.log(err)
         }
         res.sendStatus(400);
@@ -196,7 +197,7 @@ class InfoController {
         res.sendStatus(400);
     }
 
-    async employees(req, res){
+    async employees(req, res) {
         try {
             const employees = (await db.query(
                 'SELECT * FROM employee where used = true ORDER BY login'
@@ -208,8 +209,8 @@ class InfoController {
         res.sendStatus(400);
     }
 
-    async historyFilms(req, res){
-        try{
+    async historyFilms(req, res) {
+        try {
             const tempFilms = (await db.query(
                 "SELECT * FROM temp_film"
             )).rows;
@@ -229,15 +230,15 @@ class InfoController {
                 })
             }
 
-            return res.json({tempFilms})
+            return res.json({ tempFilms })
         } catch (e) {
             console.log(e)
         }
         res.sendStatus(400);
     }
 
-    async historySessions(req, res){
-        try{
+    async historySessions(req, res) {
+        try {
             const dateNow = moment();
             let tempSessions = (await db.query(
                 "SELECT * FROM temp_session where session_date > $1",
@@ -247,28 +248,38 @@ class InfoController {
                 "SELECT * FROM film where used = true"
             )).rows;
             tempSessions = tempSessions.filter(elem => {
-                if(films.find(film => film.id === elem.film_id) !== undefined){
+                if (films.find(film => film.id === elem.film_id) !== undefined) {
                     return elem;
                 }
             });
 
-            return res.json({tempSessions});
+            return res.json({ tempSessions });
         } catch (e) {
             console.log(e)
         }
         return res.sendStatus(400);
     }
 
-    async historyEmployees(req, res){
-        try{
+    async historyEmployees(req, res) {
+        try {
             const tempEmployees = (await db.query(
                 "SELECT * FROM temp_employee"
             )).rows;
-            return res.json({tempEmployees});
+            return res.json({ tempEmployees });
         } catch (e) {
             console.log(e)
         }
         res.sendStatus(400);
+    }
+
+    async backups(req, res) {
+        try {
+            const backupFiles =  fs.readdirSync("backups");
+            return res.json({ backupFiles });
+        } catch (err) {
+            console.log(err)
+        }
+        return res.sendStatus(400);
     }
 
 };

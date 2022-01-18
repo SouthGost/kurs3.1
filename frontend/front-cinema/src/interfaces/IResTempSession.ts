@@ -1,4 +1,4 @@
-interface ResSession {
+interface IResSession {
     id: number,
     date: string,
     action: string,
@@ -11,4 +11,4 @@ interface ResSession {
     used: boolean,
 };
 
-export default ResSession;
+export default IResSession;

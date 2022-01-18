@@ -4,7 +4,6 @@ import ResTicket from "../interfaces/IResTicket";
 import ResHaall from "../interfaces/IResHall";
 import ResPlaceCategory from "../interfaces/IResPlaceCategory";
 import PlaceCategory from './PlaceCategory';
-import moment from 'moment';
 import { Button, Space, Typography, Modal } from "antd";
 import User from "./User";
 import FetchRequest from "./FetchRequest";

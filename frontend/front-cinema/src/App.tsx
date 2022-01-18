@@ -21,6 +21,7 @@ import './App.css';
 import HistoryFilms from './blocks/Admin/History/Films';
 import HistorySessions from './blocks/Admin/History/Sessions';
 import HistoryEmployees from './blocks/Admin/History/Employees';
+import HistoryBackups from './blocks/Admin/History/Backups';
 
 export default function App() {
     const dispatch = useAppDispatch();
@@ -114,6 +115,7 @@ export default function App() {
                             <Route path="history/films" element={<HistoryFilms />} />
                             <Route path="history/sessions" element={<HistorySessions />} />
                             <Route path="history/employees" element={<HistoryEmployees />} />
+                            <Route path="history/backups" element={<HistoryBackups />} />
                         </Route>
                         <Route path="*" element={<WrongPage />} />
                     </Routes>

@@ -1,5 +1,4 @@
 import moment from "moment";
-import Genre from "../interfaces/IGenre";
 
 export default class FetchRequest {
 
@@ -63,7 +62,7 @@ export default class FetchRequest {
                 const data = await response.json();
                 return data.tempSessions;
             } else {
-                throw new Error("Не найдены фильмы");
+                throw new Error("");
             }
         } catch (err) {
             throw new Error("У нас проблемы. Подождите немного.");
@@ -281,7 +280,7 @@ export default class FetchRequest {
                 const data = await response.json();
                 return data.view_type;
             } else {
-                throw new Error("Не найдены Типы показа");
+                throw new Error("Не найден Тип показа");
             }
         } catch (err) {
             throw new Error("У нас проблемы. Подождите немного.");
@@ -302,7 +301,7 @@ export default class FetchRequest {
                 const data = await response.json();
                 return data.employees;
             } else {
-                throw new Error("Не найдены сеансы");
+                throw new Error("Не найдены работники");
             }
         } catch (err) {
             throw new Error("У нас проблемы. Подождите немного.");
@@ -323,7 +322,73 @@ export default class FetchRequest {
                 const data = await response.json();
                 return data.tempEmployees;
             } else {
-                throw new Error("Не найдены фильмы");
+                throw new Error("");
+            }
+        } catch (err) {
+            throw new Error("У нас проблемы. Подождите немного.");
+        }
+    }
+
+    public static async getBackups() {
+        const params = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/info/history/backups`, params);
+            if (response.ok) {
+                const data = await response.json();
+                return data.backupFiles;
+            } else {
+                throw new Error("Не найдены резервные копии");
+            }
+        } catch (err) {
+            throw new Error("У нас проблемы. Подождите немного.");
+        }
+    }
+
+    public static async addBackups(token: string) {
+        const params = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            }, body: JSON.stringify({
+                token
+            }),
+        };
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/add/backup`, params);
+            if (response.ok) {
+                return ;
+            } else {
+                throw new Error("");
+            }
+        } catch (err) {
+            throw new Error("У нас проблемы. Подождите немного.");
+        }
+    }
+
+    public static async changeDB(fileName: string, token: string) {
+        const params = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            }, body: JSON.stringify({
+                fileName,
+                token
+            }),
+        };
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/change/db`, params);
+            if (response.ok) {
+                return ;
+            } else {
+                throw new Error("");
             }
         } catch (err) {
             throw new Error("У нас проблемы. Подождите немного.");

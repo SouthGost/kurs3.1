@@ -1,6 +1,6 @@
-interface ResUser {
+interface IResUser {
     login: string;
     password: string;
 };
 
-export default ResUser;
+export default IResUser;

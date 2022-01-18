@@ -1,6 +1,14 @@
 const db = require('../db');
+const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const moment = require('moment');
+const { execSync } = require("child_process");
+const dotenv = require('dotenv');
+dotenv.config();
+
+const bd_user = process.env.DB_USER;
+const database = process.env.DATABASE;
 
 function isApply(token, positions) {
     const user = jwt.verify(token, 'key');
@@ -101,6 +109,31 @@ class ChangeController {
                 }
 
                 return res.json({ message: "Ok" })
+            }
+        } catch (err) {
+            console.log(err);
+        }
+        return res.sendStatus(400);
+    }
+
+    async changeDB(req, res) {
+        try {
+            const { fileName, token } = req.body;
+            if (isApply(token, ["admin"])) {
+                if (!fs.existsSync(`backups\\${fileName}`)) {
+                    throw new Error(`Не найден файл backups\\${fileName}`)
+                }
+                let path = ""
+                const fileNameSplit = __filename.split("\\");
+                for (let i = 0; i < fileNameSplit.length - 2; i++) {
+                    path += `${fileNameSplit[i]}\\`
+                }
+                path += `backups\\`;
+                await execSync(`pg_dump -U ${bd_user} -d ${database} -f ${path}${moment().format("HH-mm-ss_DD-MM-YYYY")} -F t`);
+                await execSync(`dropdb -U ${bd_user} ${database}`);
+                await execSync(`pg_restore -U ${bd_user} -cC -d ${database} ${path}${fileName}`);
+
+                return res.json({ message: "Ok" });
             }
         } catch (err) {
             console.log(err);

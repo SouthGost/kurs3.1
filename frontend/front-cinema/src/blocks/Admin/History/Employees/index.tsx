@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import ResTempEmployee from "../../../../interfaces/IResTempEmployee";
-import ResEmployeeilm from "../../../../interfaces/IResEmployee";
 import FetchRequest from "../../../../classes/FetchRequest";
 import ResEmployee from "../../../../interfaces/IResEmployee";
-import { Modal, Space, Typography, Table, Select, Button, notification } from "antd";
+import { Modal, Space, Typography, Table, Button, notification } from "antd";
 import Cookies from "js-cookie";
-const { Text, Title, Paragraph } = Typography;
-const { Option } = Select;
+import { useAppSelector } from "../../../../reducers/store";
+const { Text, Title } = Typography;
 type TempEmployee = {
     id: number,
     date: string,
@@ -24,6 +23,16 @@ type TempEmployee = {
 export default function HistoryEmployees() {
     const [tempEmployees, setTempEmployees] = useState<TempEmployee[]>();
     const token = Cookies.get("token");
+    const user = useAppSelector(state => state.user.val);
+
+    useEffect(() => {
+        const position = user.getPosition();
+        const login = user.getLogin();
+
+        if ((position !== "admin" && login !== "") || token === undefined) {
+            window.location.replace("http://localhost:3000/admin");
+        }
+    }, [user]);
 
     async function loadTempEmployees() {
         try {

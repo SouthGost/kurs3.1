@@ -1,6 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import User from '../classes/User';
-import Employee from '../classes/Employee';
 
 const initialState:{val:User} = {
     val: new User({login: "", password: ""}),

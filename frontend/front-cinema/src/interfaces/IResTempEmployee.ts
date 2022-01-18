@@ -1,4 +1,4 @@
-interface ResTempEmployee {
+interface IResTempEmployee {
     id: number,
     date: string,
     action: string,
@@ -11,4 +11,4 @@ interface ResTempEmployee {
     used: boolean,
 };
 
-export default ResTempEmployee;
+export default IResTempEmployee;

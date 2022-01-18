@@ -16,5 +16,6 @@ router.post('/employees', infoController.employees);
 router.post('/history/films', infoController.historyFilms);
 router.post('/history/sessions', infoController.historySessions);
 router.post('/history/employees', infoController.historyEmployees);
+router.post('/history/backups', infoController.backups);
 
 module.exports = router;

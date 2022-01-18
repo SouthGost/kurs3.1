@@ -7,6 +7,7 @@ import ResFilm from "../../../../interfaces/IResFilm";
 import ResHall from "../../../../interfaces/IResHall";
 import ResSession from "../../../../interfaces/IResSession";
 import ResViewType from "../../../../interfaces/IResViewType";
+import { useAppSelector } from "../../../../reducers/store";
 const { Text, Title, Paragraph } = Typography;
 const { Option } = Select;
 type property = "cost" | "view_type_id" | "film_id";
@@ -28,6 +29,16 @@ export default function EditSessions() {
     const [halls, setHalls] = useState<ResHall[]>();
     const [viewTypes, setViewTypes] = useState<ResViewType[]>();
     const token = Cookies.get("token");
+    const user = useAppSelector(state => state.user.val);
+
+    useEffect(() => {
+        const position = user.getPosition();
+        const login = user.getLogin();
+
+        if ((position !== "admin" && login !== "") || token === undefined) {
+            window.location.replace("http://localhost:3000/admin");
+        }
+    }, [user]);
 
     async function loadAllSessions() {
         try {
