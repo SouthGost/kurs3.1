@@ -33,6 +33,11 @@ export default function Admin() {
                         Добавить сеанс
                     </Button>
                 </Link>
+                <Link to="history/tickets">
+                    <Button className="admin_link">
+                        Возврат билетов
+                    </Button>
+                </Link>
                 {user.getPosition() === "admin" ?
                     <>
                         <Link to="add/employee">
@@ -70,11 +75,11 @@ export default function Admin() {
                                 История работников
                             </Button>
                         </Link>
-                        <Link to="history/backups">
+                        {/* <Link to="history/backups">
                             <Button className="admin_link">
                                 История базы данных
                             </Button>
-                        </Link>
+                        </Link> */}
                     </>
                     :
                     <></>

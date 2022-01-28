@@ -1,6 +1,16 @@
 const db = require('../db');
 const fs = require('fs');
 const moment = require('moment');
+const jwt = require('jsonwebtoken');
+
+function isApply(token, positions) {
+    const user = jwt.verify(token, 'key');
+    const position = positions.find(elem => elem === user.position);
+    if (position === undefined) {
+        return false;
+    }
+    return true;
+}
 
 class InfoController {
 
@@ -24,8 +34,8 @@ class InfoController {
                 )).rows;
                 return res.json({ places, hall, place_categorys });
             }
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     }
@@ -51,8 +61,8 @@ class InfoController {
                 })
             }
             return res.json({ films });
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     };
@@ -63,8 +73,8 @@ class InfoController {
                 'SELECT * FROM hall ORDER BY id'
             )).rows;
             return res.json({ halls });
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     };
@@ -75,8 +85,8 @@ class InfoController {
                 'SELECT * FROM view_type ORDER BY id'
             )).rows;
             return res.json({ view_types });
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     };
@@ -124,8 +134,8 @@ class InfoController {
                 });
                 return res.json({ dates });
             }
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     }
@@ -138,8 +148,8 @@ class InfoController {
                 [dateNow.format('x')]
             )).rows;
             return res.json({ sessions });
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     }
@@ -163,8 +173,8 @@ class InfoController {
                 )).rows;
                 return res.json({ sessions });
             }
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     }
@@ -174,13 +184,13 @@ class InfoController {
             const { session_id } = req.body;
             if (session_id != undefined) {
                 const tickets = (await db.query(
-                    'SELECT * FROM ticket where session_id = $1',
+                    'SELECT * FROM ticket where session_id = $1 AND used = true',
                     [session_id]
                 )).rows;
                 return res.json({ tickets });
             }
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     }
@@ -191,8 +201,8 @@ class InfoController {
                 'SELECT * FROM genre'
             )).rows;
             return res.json({ genres });
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     }
@@ -203,8 +213,8 @@ class InfoController {
                 'SELECT * FROM employee where used = true ORDER BY login'
             )).rows;
             return res.json({ employees });
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     }
@@ -231,8 +241,8 @@ class InfoController {
             }
 
             return res.json({ tempFilms })
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     }
@@ -254,8 +264,8 @@ class InfoController {
             });
 
             return res.json({ tempSessions });
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         return res.sendStatus(400);
     }
@@ -266,15 +276,53 @@ class InfoController {
                 "SELECT * FROM temp_employee"
             )).rows;
             return res.json({ tempEmployees });
-        } catch (e) {
-            console.log(e)
+        } catch (err) {
+            console.log(err);
         }
         res.sendStatus(400);
     }
 
+    async places(req, res) {
+        try {
+            const places = (await db.query(
+                "SELECT * FROM place"
+            )).rows;
+            return res.json({ places });
+        } catch (err) {
+            console.log(err)
+        }
+        return res.sendStatus(400);
+    }
+
+    async alltickets(req, res) {
+        try {
+            const { token } = req.body;
+            if (isApply(token, ["admin", "seller"])) {
+                const dateNow = moment();
+                const sessions = (await db.query(
+                    'SELECT * FROM session where date > $1 AND used = true ORDER BY date, hall_id',
+                    [dateNow.format('x')]
+                )).rows;
+                let tickets = [];
+                for (const session of sessions) {
+                    const ticketsAtSession = (await db.query(
+                        "SELECT * FROM ticket where session_id = $1 and used = true",
+                        [session.id]
+                    )).rows;
+
+                    tickets = tickets.concat(ticketsAtSession);
+                }
+                return res.json({ tickets });
+            }
+        } catch (err) {
+            console.log(err)
+        }
+        return res.sendStatus(400);
+    }
+
     async backups(req, res) {
         try {
-            const backupFiles =  fs.readdirSync("backups");
+            const backupFiles = fs.readdirSync("backups");
             return res.json({ backupFiles });
         } catch (err) {
             console.log(err)

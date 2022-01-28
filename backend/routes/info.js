@@ -11,6 +11,8 @@ router.post('/viewType', infoController.viewType);
 router.post('/films', infoController.films);
 router.post('/checkdates', infoController.checkDates); 
 router.post('/tickets', infoController.ticketsAtSession);
+router.post('/places', infoController.places);
+router.post('/alltickets', infoController.alltickets);
 router.post('/genres', infoController.genres);
 router.post('/employees', infoController.employees);
 router.post('/history/films', infoController.historyFilms);

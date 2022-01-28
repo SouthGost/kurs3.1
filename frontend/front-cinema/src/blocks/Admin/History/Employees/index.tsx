@@ -5,6 +5,7 @@ import ResEmployee from "../../../../interfaces/IResEmployee";
 import { Modal, Space, Typography, Table, Button, notification } from "antd";
 import Cookies from "js-cookie";
 import { useAppSelector } from "../../../../reducers/store";
+import moment from "moment";
 const { Text, Title } = Typography;
 type TempEmployee = {
     id: number,
@@ -98,6 +99,11 @@ export default function HistoryEmployees() {
             title: "Дата",
             dataIndex: "date",
             key: "id",
+            render: (date: string, tempEmployee: TempEmployee) =>
+                <Text>
+                    {moment(date).format("HH:mm:ss DD.MM.yyyy")}
+                </Text>
+
         },
         {
             title: "Логин",

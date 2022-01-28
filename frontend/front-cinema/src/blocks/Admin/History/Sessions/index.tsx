@@ -119,6 +119,10 @@ export default function HistorySessions() {
             title: "Дата",
             dataIndex: "date",
             key: "id",
+            render: (date: string, tempSession: TempSession) =>
+                <Text>
+                    {moment(date).format("HH:mm:ss DD.MM.yyyy")}
+                </Text>
         },
         {
             title: "Зал",

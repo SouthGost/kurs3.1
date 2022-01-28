@@ -157,6 +157,51 @@ export default class FetchRequest {
         }
     }
 
+    public static async getPlaces(){
+        const params = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/info/places`, params);
+            if (response.ok) {
+                const data = await response.json();
+                return data.places;
+            } else {
+                throw new Error("Не найдены места");
+            }
+        } catch (err) {
+            throw new Error("У нас проблемы. Подождите немного.");
+        }
+    }
+
+    public static async getAllTickets(token: string){
+        const params = {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token,
+            }),
+        };
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/info/alltickets`, params);
+            if (response.ok) {
+                const data = await response.json();
+                return data.tickets;
+            } else {
+                throw new Error("Не найдены билеты");
+            }
+        } catch (err) {
+            throw new Error("У нас проблемы. Подождите немного.");
+        }
+    }
+
     public static async getHalls() {
         const params = {
             method: "POST",

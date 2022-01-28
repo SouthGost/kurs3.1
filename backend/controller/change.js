@@ -116,6 +116,30 @@ class ChangeController {
         return res.sendStatus(400);
     }
 
+    async backTickets(req, res) {
+        try {
+            const { returnedTickets, token } = req.body;
+            if (
+                returnedTickets.length > 0 &&
+                isApply(token, ["admin"])
+            ) {
+                for (const ticket of returnedTickets) {
+                    console.log(ticket)
+                    const newTicket = await db.query(
+                        'UPDATE ticket set used = false where id = $1',
+                        [ticket.id]
+                    );
+                    // console.log(newTicket);
+                }
+
+                return res.json({ message: "Ok" })
+            }
+        } catch (err) {
+            console.log(err);
+        }
+        return res.sendStatus(400);
+    }
+
     async changeDB(req, res) {
         try {
             const { fileName, token } = req.body;

@@ -18,6 +18,7 @@ import EditFilms from './blocks/Admin/Edit/Films';
 import EditSessions from './blocks/Admin/Edit/Sessions';
 import EditEmpolyees from './blocks/Admin/Edit/Empolyees';
 import './App.css';
+import HistoryTickets from './blocks/Admin/History/Tickets';
 import HistoryFilms from './blocks/Admin/History/Films';
 import HistorySessions from './blocks/Admin/History/Sessions';
 import HistoryEmployees from './blocks/Admin/History/Employees';
@@ -108,6 +109,7 @@ export default function App() {
                         <Route path="/admin" element={<Admin />} >
                             <Route path="add/film" element={<AddFilm />} />
                             <Route path="add/session" element={<AddSession />} />
+                            <Route path="history/tickets" element={<HistoryTickets />} />
                             <Route path="add/employee" element={<AddEmployee />} />
                             <Route path="edit/films" element={<EditFilms />} />
                             <Route path="edit/sessions" element={<EditSessions />} />

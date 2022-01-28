@@ -42,8 +42,8 @@ class AuthController {
                     });
                 }
             }
-        } catch (e) {
-            console.log(e.message);
+        } catch (err) {
+            console.log(err);
         }
         return res.sendStatus(400);
     };
@@ -56,8 +56,8 @@ class AuthController {
             }
             const user = jwt.verify(token, 'key');
             return res.json({ user });
-        } catch (e) {
-            console.log(e.message);
+        } catch (err) {
+            console.log(err);
         }
         return res.sendStatus(400);
     }
@@ -83,8 +83,8 @@ class AuthController {
                     });
                 }
             }
-        } catch (e) {
-            console.log(e.message);
+        } catch (err) {
+            console.log(err);
         }
         return res.sendStatus(400);
     }
@@ -115,8 +115,8 @@ class AuthController {
                     return res.json({ newEmployee });
                 }
             }
-        } catch (e) {
-            console.log(e.message);
+        } catch (err) {
+            console.log(err);
         }
         return res.sendStatus(400);
     };

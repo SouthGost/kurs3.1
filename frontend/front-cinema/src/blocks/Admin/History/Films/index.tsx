@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import ResFilm from "../../../../interfaces/IResFilm";
 import { Modal, Space, Typography, Table, Button, notification } from "antd";
 import { useAppSelector } from "../../../../reducers/store";
+import moment from "moment";
 const { Text, Title } = Typography;
 type TempFilm = {
     id: number,
@@ -99,6 +100,10 @@ export default function HistoryFilms() {
             title: "Дата",
             dataIndex: "date",
             key: "id",
+            render: (date: string, tempFilm: TempFilm) =>
+                <Text>
+                    {moment(date).format("HH:mm:ss DD.MM.yyyy")}
+                </Text>
         },
         {
             title: "Имя фильма",

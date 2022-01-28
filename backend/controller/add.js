@@ -44,8 +44,8 @@ class AddController {
 
                 return res.json({ message: "Ok" });
             }
-        } catch (e) {
-            console.log(e.message);
+        } catch (err) {
+            console.log(err);
         }
         return res.sendStatus(400);
     };
@@ -91,8 +91,8 @@ class AddController {
                 }
                 return res.json({ message: "Ok" });
             }
-        } catch (e) {
-            console.log(e.message);
+        } catch (err) {
+            console.log(err);
         }
         return res.sendStatus(400);
     };
@@ -109,26 +109,34 @@ class AddController {
                 session_id !== undefined &&
                 choosed_places.length !== 0
             ) {
-                for (const place_id of choosed_places) {
-                    const ticket = (await db.query(
-                        'SELECT * FROM ticket  where session_id = $1 AND place_id = $2',
-                        [session_id, place_id]
-                    )).rows[0];
-
-                    if (ticket !== undefined) {
-
-                        return res.sendStatus(400);
-                    }
-                }
                 const newTickets = [];
                 try {
                     for (const place_id of choosed_places) {
-                        const newTicket = (await db.query(
-                            'INSERT INTO ticket (place_id, session_id, user_login, employee_login) values ($1, $2, $3, $4) RETURNING *',
-                            [place_id, session_id, user_login, employee_login]
+                        const ticket = (await db.query(
+                            'SELECT * FROM ticket  where session_id = $1 AND place_id = $2',
+                            [session_id, place_id]
                         )).rows[0];
 
-                        newTickets.push(newTicket);
+                        if (ticket !== undefined) {
+                            if (!ticket.used) {
+                                const newTicket = (await db.query(
+                                    'UPDATE ticket set user_login = $2, employee_login = $3, used = true where id = $1 RETURNING *',
+                                    [ticket.id, user_login, employee_login]
+                                )).rows[0];;
+
+                                newTickets.push(newTicket); 
+                            } else {
+
+                                throw new Error("Место уже занято")
+                            }
+                        } else {
+                            const newTicket = (await db.query(
+                                'INSERT INTO ticket (place_id, session_id, user_login, employee_login, used) values ($1, $2, $3, $4, true) RETURNING *',
+                                [place_id, session_id, user_login, employee_login]
+                            )).rows[0];
+    
+                            newTickets.push(newTicket);
+                        }
                     }
                     const session = (await db.query(
                         "SELECT * FROM session WHERE id = $1",
@@ -154,25 +162,24 @@ class AddController {
 
                         text += `${film.name} ${moment(session.date, "x").format("HH:mm DD.MM.YYYY")} ${hall.name}, Место: ряд ${place.row} номер ${place.number}.\n`
                     }
-                    await fs.readdir("tickets", function (err, files) {
-                        for (const file of files) {
-                            fs.unlink(`tickets\\${file}`, function () { });
-                        }
-                    })
+                    const files = fs.readdirSync("tickets")
+                    for (const file of files) {
+                        fs.unlink(`tickets\\${file}`, function () { });
+                    }
                     fs.writeFileSync(path, text);
                     return res.download(path, fileName);
                 } catch (err) {
-                    console.log(err.message);
+                    console.log(err);
                     for (const ticket of newTickets) {
-                        const deleteTicked = await db.query(
+                        await db.query(
                             'DELETE FROM ticket where id = $1',
                             [ticket.id]
                         );
                     }
                 }
             }
-        } catch (e) {
-            console.log(e.message);
+        } catch (err) {
+            console.log(err);
         }
         return res.sendStatus(400);
     }
@@ -181,18 +188,13 @@ class AddController {
         try {
             const { token } = req.body;
             if (isApply(token, ["admin"])) {
-                let path = ""
-                const fileNameSplit = __filename.split("\\");
-                for (let i = 0; i < fileNameSplit.length - 2; i++) {
-                    path += `${fileNameSplit[i]}\\`
-                }
-                path += `backups\\${moment().format("HH-mm-ss_DD-MM-YYYY")}`;
+                const path = `${__dirname}\\backups\\${moment().format("HH-mm-ss_DD-MM-YYYY")}`;
                 execSync(`pg_dump -U ${bd_user} -d ${database} -f ${path} -F t`);
 
                 return res.json({ message: "Ok" });
             }
-        } catch (e) {
-            console.log(e);
+        } catch (err) {
+            console.log(err);
         }
         return res.sendStatus(400);
     }

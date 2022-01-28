@@ -57,9 +57,9 @@ export default function Sessions() {
             <DatePicker
                 value={choosedDate}
                 allowClear={false}
-                // disabledDate={(current) => {
-                //     return current < moment().add(-1, 'days');
-                // }}
+                disabledDate={(current) => {
+                    return current < moment().add(-1, 'days');
+                }}
                 onChange={(date, dateString) => {
                     setChoosedDate(date!);
                 }}
