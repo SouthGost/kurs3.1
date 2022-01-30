@@ -132,7 +132,7 @@ export default function HistoryEmployees() {
 
     return (
         <Space direction="vertical">
-            <Title>История базы данных</Title>
+            <Title>Резервные копии БД</Title>
             {backups === undefined ?
                 <Text>Загрузка</Text>
                 :
@@ -142,7 +142,7 @@ export default function HistoryEmployees() {
                         type="primary"
                         onClick={chooseBackup}
                     >
-                        Изменить
+                        Восстановить
                     </Button>
                     <Button
                         type="primary"

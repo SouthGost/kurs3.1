@@ -153,9 +153,10 @@ class ChangeController {
                     path += `${fileNameSplit[i]}\\`
                 }
                 path += `backups\\`;
-                await execSync(`pg_dump -U ${bd_user} -d ${database} -f ${path}${moment().format("HH-mm-ss_DD-MM-YYYY")} -F t`);
-                await execSync(`dropdb -U ${bd_user} ${database}`);
-                await execSync(`pg_restore -U ${bd_user} -cC -d ${database} ${path}${fileName}`);
+                console.log(path)
+                // await execSync(`pg_dump -U ${bd_user} -d ${database} -f ${path}${moment().format("DD.MM.YYYY_HH-mm-ss")} -F t`);
+                // await execSync(`dropdb -U ${bd_user} ${database}`);
+                // await execSync(`pg_restore -U ${bd_user} -cC -d ${database} ${path}${fileName}`);
 
                 return res.json({ message: "Ok" });
             }

@@ -188,7 +188,12 @@ class AddController {
         try {
             const { token } = req.body;
             if (isApply(token, ["admin"])) {
-                const path = `${__dirname}\\backups\\${moment().format("HH-mm-ss_DD-MM-YYYY")}`;
+                let path = ""
+                const fileNameSplit = __filename.split("\\");
+                for (let i = 0; i < fileNameSplit.length - 2; i++) {
+                    path += `${fileNameSplit[i]}\\`
+                }
+                path += `backups\\${moment().format("DD.MM.YYYY_HH-mm-ss")}`;
                 execSync(`pg_dump -U ${bd_user} -d ${database} -f ${path} -F t`);
 
                 return res.json({ message: "Ok" });

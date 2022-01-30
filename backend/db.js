@@ -1,4 +1,4 @@
-const { execSync  } = require("child_process");
+const { execSync } = require("child_process");
 const Pool = require('pg').Pool;
 const dotenv = require('dotenv');
 dotenv.config();
@@ -17,13 +17,14 @@ const pool = new Pool({
 pool.connect((err) => {
     if (err) {
         console.log(err);
-        let path = "";
+        let path = ""
         const fileNameSplit = __filename.split("\\");
-        for (let i = 0; i < fileNameSplit.length - 1; i++) {
-            path += `${fileNameSplit[i]}\\`;
+        for (let i = 0; i < fileNameSplit.length - 2; i++) {
+            path += `${fileNameSplit[i]}\\`
         }
         path += fileName;
-        execSync(`pg_restore -U ${bd_user} -cC -d ${database} ${path}`);
+        console.log(path)
+        //execSync(`pg_restore -U ${bd_user} -cC -d ${database} ${path}`);
     }
 })
 

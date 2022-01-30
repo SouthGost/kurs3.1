@@ -21,8 +21,6 @@ export default function AddFilm() {
     const token = Cookies.get("token");
 
     useEffect(() => {
-
-
         async function getGenres() {
             try {
                 setGenres(await FetchRequest.getGenres());

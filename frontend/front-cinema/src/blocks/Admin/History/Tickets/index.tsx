@@ -30,15 +30,6 @@ export default function HistorySessions() {
     const token = Cookies.get("token");
     const user = useAppSelector(state => state.user.val);
 
-    useEffect(() => {
-        const position = user.getPosition();
-        const login = user.getLogin();
-
-        if ((position !== "admin" && login !== "") || token === undefined) {
-            window.location.replace("http://localhost:3000/admin");
-        }
-    }, [user]);
-
     async function loadTempTickets() {
         try {
             const resTempTickets: ResTicket[] = await FetchRequest.getAllTickets(token!);

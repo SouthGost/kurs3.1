@@ -75,11 +75,11 @@ export default function Admin() {
                                 История работников
                             </Button>
                         </Link>
-                        {/* <Link to="history/backups">
+                        <Link to="history/backups">
                             <Button className="admin_link">
-                                История базы данных
+                                Резервные копии БД
                             </Button>
-                        </Link> */}
+                        </Link>
                     </>
                     :
                     <></>
