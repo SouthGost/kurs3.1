@@ -193,8 +193,9 @@ class AddController {
                 for (let i = 0; i < fileNameSplit.length - 2; i++) {
                     path += `${fileNameSplit[i]}\\`
                 }
-                path += `backups\\${moment().format("DD.MM.YYYY_HH-mm-ss")}`;
-                execSync(`pg_dump -U ${bd_user} -d ${database} -f ${path} -F t`);
+                path += `backups\\${moment().format("DD-MM-YYYY_HH-mm-ss")}`;
+                //execSync(`PGPASSWORD='123' pg_dump -U ${bd_user} -d ${database} -f ${path} -F t`); ${process.env.}
+                execSync(`set PGPASSWORD=${process.env.DB_PASSWORD}&& pg_dump --no-owner --format=c -h ${process.env.DB_HOST} -p ${process.env.DB_PORT} -U ${process.env.DB_USER} ${process.env.DATABASE} > ${path}`);
 
                 return res.json({ message: "Ok" });
             }

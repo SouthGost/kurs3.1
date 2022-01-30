@@ -153,9 +153,8 @@ class ChangeController {
                     path += `${fileNameSplit[i]}\\`
                 }
                 path += `backups\\`;
-                console.log(path)
-                // await execSync(`pg_dump -U ${bd_user} -d ${database} -f ${path}${moment().format("DD.MM.YYYY_HH-mm-ss")} -F t`);
-                // await execSync(`dropdb -U ${bd_user} ${database}`);
+                execSync(`set PGPASSWORD=${process.env.DB_PASSWORD}&& pg_dump --no-owner --format=c -h ${process.env.DB_HOST} -p ${process.env.DB_PORT} -U ${process.env.DB_USER} ${process.env.DATABASE} > ${path}${moment().format("DD-MM-YYYY_HH-mm-ss")}`);
+                execSync(`set PGPASSWORD=${process.env.DB_PASSWORD}&& pg_restore --clean --no-privileges --no-owner -U ${process.env.DB_USER} -d ${process.env.DATABASE} ${path}${fileName}`);
                 // await execSync(`pg_restore -U ${bd_user} -cC -d ${database} ${path}${fileName}`);
 
                 return res.json({ message: "Ok" });
