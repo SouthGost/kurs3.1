@@ -1,6 +1,8 @@
 Для запуска необходимо:
 node js,
 postgreSQL
+в файле \\kurs3.1\\backend\\.env 
+настроить информацию о базе данных
 в терменале с путем <путь к папке kurs3.1>\\kurs3.1\\backend:
 npm i
 npm run dev
