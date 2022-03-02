@@ -1,8 +1,6 @@
 Для запуска необходимо:
 node js,
-ввести команды в теменале:
-createdb -U <имя пользователя бд> node_pg_test
-pg_restore -U <имя пользователя бд> -cC -d node_pg_test <путь к папке kurs3.1>\\kurs3.1\\cinema_db
+postgreSQL
 в терменале с путем <путь к папке kurs3.1>\\kurs3.1\\backend:
 npm i
 npm run dev
